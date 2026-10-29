@@ -7,7 +7,8 @@ import { renderSite, siteConfig } from '../lib/render.mjs';
 import { checkPassword, isConfigured, resetRateLimit, verifySession } from '../lib/auth.mjs';
 import { getContent, login, putContent } from '../lib/admin-api.mjs';
 import { createGithub } from '../lib/github.mjs';
-import { bumpSitemap } from '../lib/publish.mjs';
+import { bumpSitemap, publishContent } from '../lib/publish.mjs';
+import { assertWorksComplete, normalizeUploads, workFileChanges } from '../lib/works.mjs';
 
 let failed = 0;
 function check(name, fn) {
@@ -97,6 +98,7 @@ check('html in reviews is rejected', () => {
 check('app.js reads the same config the page embeds', () => {
   const source = fs.readFileSync('app.js', 'utf8');
   assert.match(source, /siteConfig\?\.prices/);
+  assert.match(source, /dataset\.before/);
   assert.match(source, /data-extra="chem"|\[data-extra="chem"\]/);
   assert.doesNotMatch(source, /data-price="2000"/);
 });
@@ -220,6 +222,157 @@ await checkAsync('github client commits on the branch name with a slash', async 
 
 function json(data, status = 200) {
   return { ok: status < 300, status, text: async () => JSON.stringify(data) };
+}
+
+check('empty work list does not add photo slots', () => {
+  assert.equal(html.includes('img/works/'), false);
+  assert.equal(html.includes('works-added'), false);
+  assert.equal(html.includes('data-before='), false);
+});
+
+check('uploaded before/after pairs render into the gallery and slider', () => {
+  const next = structuredClone(content);
+  next.works = [{ id: 'abcdef012345', caption: 'Кухня & "стол"', portrait: true, rev: 3 }];
+  const page = renderSite(next);
+  assert.match(page, /class="gallery works-added"/);
+  assert.match(page, /src="img\/works\/abcdef012345-before\.jpg\?v=3"/);
+  assert.match(page, /src="img\/works\/abcdef012345-after\.jpg\?v=3"/);
+  assert.match(page, /alt="Кухня &amp; &quot;стол&quot; до уборки"/);
+  assert.match(page, /data-ba="w-abcdef012345"/);
+  assert.match(page, /data-portrait="1"/);
+  assert.match(page, /data-note="Реальная работа Quality Клининг: Кухня &amp; &quot;стол&quot;\."/);
+  assert.equal(page.includes('<script>alert'), false);
+  assert.equal(page.includes('%%'), false);
+});
+
+check('work entries reject bad ids, markup and too many pairs', () => {
+  const badId = structuredClone(content);
+  badId.works = [{ id: '../secret-file', caption: 'Кухня', portrait: false, rev: 1 }];
+  assert.throws(() => normalizeContent(badId), ContentError);
+  const badCaption = structuredClone(content);
+  badCaption.works = [{ id: 'abcdef012345', caption: '<img>', portrait: false, rev: 1 }];
+  assert.throws(() => normalizeContent(badCaption), ContentError);
+  const tooMany = structuredClone(content);
+  tooMany.works = Array.from({ length: 25 }, (_, index) => ({
+    id: index.toString(16).padStart(12, '0'),
+    caption: 'Пара',
+    portrait: false,
+    rev: 1,
+  }));
+  assert.throws(() => normalizeContent(tooMany), ContentError);
+});
+
+check('work uploads stay inside img/works and removals delete both files', () => {
+  const jpeg = minimalJpeg();
+  const works = [{ id: 'abcdef012345', caption: 'Кухня', portrait: false, rev: 2 }];
+  const uploads = normalizeUploads([
+    { id: 'abcdef012345', side: 'before', data: jpeg },
+    { id: 'abcdef012345', side: 'after', data: jpeg },
+  ], works);
+  assert.equal(uploads.length, 2);
+  assert.equal(uploads[0].bytes >= 100, true);
+  const files = workFileChanges(
+    [{ id: 'abcdef012345', caption: 'Кухня' }, { id: 'bbbbbbbbbbbb', caption: 'Старая' }],
+    works,
+    uploads,
+  );
+  assert.deepEqual(files.map((file) => file.path), [
+    'img/works/abcdef012345-before.jpg',
+    'img/works/abcdef012345-after.jpg',
+    'img/works/bbbbbbbbbbbb-before.jpg',
+    'img/works/bbbbbbbbbbbb-after.jpg',
+  ]);
+  assert.equal(files[2].deleted, true);
+  assert.equal(files[3].deleted, true);
+  const svg = Buffer.from('<svg></svg>'.padEnd(120, ' ')).toString('base64');
+  assert.throws(() => normalizeUploads([{ id: 'abcdef012345', side: 'before', data: svg }], works), ContentError);
+  assert.throws(() => assertWorksComplete([], works, []), ContentError);
+});
+
+await checkAsync('a new pair without both photos is rejected and a complete pair stops only on missing token', async () => {
+  delete process.env.CMS_LOCAL_PUBLISH;
+  delete process.env.CMS_GITHUB_TOKEN;
+  process.env.ADMIN_PASSWORD = 'correct-horse-battery';
+  resetRateLimit();
+  const now = Date.now();
+  const good = await login({ method: 'POST', headers: host, body: { password: 'correct-horse-battery' }, ip: '203.0.113.20', secure: false, now });
+  const cookie = good.headers['Set-Cookie'].split(';')[0];
+  const next = structuredClone(content);
+  next.works = [{ id: 'abcdef012345', caption: 'Кухня', portrait: true, rev: 2 }];
+  const missing = await putContent({
+    method: 'PUT',
+    headers: { ...host, cookie },
+    body: { content: next, uploads: [] },
+    ip: '203.0.113.20',
+    secure: false,
+    now,
+  }, { publish: publishContent });
+  assert.equal(missing.status, 400);
+  assert.match(missing.body.error, /фото/);
+  const jpeg = minimalJpeg();
+  const noToken = await putContent({
+    method: 'PUT',
+    headers: { ...host, cookie },
+    body: {
+      content: next,
+      uploads: [
+        { id: 'abcdef012345', side: 'before', data: jpeg },
+        { id: 'abcdef012345', side: 'after', data: jpeg },
+      ],
+    },
+    ip: '203.0.113.20',
+    secure: false,
+    now,
+  }, { publish: publishContent });
+  assert.equal(noToken.status, 503);
+  assert.equal(fs.existsSync('img/works/abcdef012345-before.jpg'), false);
+  delete process.env.ADMIN_PASSWORD;
+});
+
+await checkAsync('github commit stores jpeg bytes and deletes removed work photos', async () => {
+  process.env.CMS_BRANCH = 'main';
+  process.env.CMS_GITHUB_REPO = 'mikakostoev/quality-cleaning-astana';
+  const calls = [];
+  const fetchImpl = async (url, options = {}) => {
+    calls.push({ url, method: options.method || 'GET', body: options.body ? JSON.parse(options.body) : null });
+    if (url.includes('/git/ref/heads/main') && (options.method || 'GET') === 'GET') return json({ object: { sha: 'parent' } });
+    if (url.endsWith('/git/commits/parent')) return json({ tree: { sha: 'tree0' } });
+    if (url.includes('/git/blobs')) return json({ sha: `blob${calls.length}` });
+    if (url.includes('/git/trees')) return json({ sha: 'tree1' });
+    if (url.endsWith('/git/commits')) return json({ sha: 'commit1' });
+    if (url.includes('/git/refs/heads/main') && options.method === 'PATCH') return json({ ref: 'ok' });
+    return json({ message: 'nope' }, 404);
+  };
+  const github = createGithub({ token: 'test-token', fetchImpl });
+  const jpeg = minimalJpeg();
+  await github.commit({
+    message: 'Обновление текстов, цен и фото работ',
+    files: [
+      { path: 'content/site.json', content: '{}\n' },
+      { path: 'img/works/abcdef012345-before.jpg', content: jpeg, encoding: 'base64' },
+      { path: 'img/works/bbbbbbbbbbbb-before.jpg', deleted: true },
+    ],
+  });
+  const blobs = calls.filter((call) => call.url.includes('/git/blobs'));
+  assert.equal(blobs.length, 2);
+  assert.equal(blobs.some((call) => call.body.content === jpeg && call.body.encoding === 'base64'), true);
+  const tree = calls.find((call) => call.url.includes('/git/trees')).body.tree;
+  const removed = tree.find((item) => item.path === 'img/works/bbbbbbbbbbbb-before.jpg');
+  assert.equal(removed.sha, null);
+  await assert.rejects(
+    () => github.commit({ files: [{ path: '../evil.jpg', content: 'x' }], message: 'no' }),
+    (error) => error.code === 'PATH',
+  );
+  delete process.env.CMS_BRANCH;
+});
+
+function minimalJpeg() {
+  const buf = Buffer.alloc(120, 7);
+  buf[0] = 0xff;
+  buf[1] = 0xd8;
+  buf[2] = 0xff;
+  buf[119] = 0xd9;
+  return buf.toString('base64');
 }
 
 if (failed) {

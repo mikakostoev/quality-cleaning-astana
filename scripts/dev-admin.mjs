@@ -46,7 +46,8 @@ const server = http.createServer((req, res) => {
   const fn = routes[url.pathname];
   if (fn) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-    return handle(req, res, fn);
+    const maxBytes = url.pathname === '/api/admin/content' && req.method === 'PUT' ? 3_500_000 : 300_000;
+    return handle(req, res, fn, { maxBytes });
   }
   const file = fileFor(url.pathname);
   if (!file || !fs.existsSync(file) || !fs.statSync(file).isFile()) {

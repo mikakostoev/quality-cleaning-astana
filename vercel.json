@@ -3,9 +3,12 @@
   "framework": null,
   "buildCommand": "node scripts/render.mjs",
   "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/", "destination": "/api/home" }
+  ],
   "functions": {
     "api/**/*.js": {
-      "includeFiles": "content/**"
+      "includeFiles": "{content,templates}/**"
     }
   },
   "headers": [

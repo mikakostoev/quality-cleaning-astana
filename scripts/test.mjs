@@ -101,6 +101,23 @@ check('app.js reads the same config the page embeds', () => {
   assert.doesNotMatch(source, /data-price="2000"/);
 });
 
+check('admin phone shell hides jump and dock until login', () => {
+  const html = fs.readFileSync('admin/index.html', 'utf8');
+  const css = fs.readFileSync('admin/admin.css', 'utf8');
+  const js = fs.readFileSync('admin/admin.js', 'utf8');
+  assert.match(html, /id="jump"[^>]*hidden/);
+  assert.match(html, /id="dock"[^>]*hidden/);
+  assert.match(html, /id="save"/);
+  assert.match(css, /\[hidden\]\s*\{[^}]*display:\s*none\s*!important/);
+  assert.match(css, /body\.editing \.dock/);
+  assert.match(js, /dock\.hidden = false/);
+  assert.match(js, /dock\.hidden = true/);
+  assert.match(js, /classList\.add\('editing'\)/);
+  for (const id of ['sec-prices', 'sec-phones', 'sec-hero', 'sec-services', 'sec-faq', 'sec-reviews', 'sec-more']) {
+    assert.match(js, new RegExp(`id: '${id}'`));
+  }
+});
+
 check('admin is noindex and absent from the sitemap', () => {
   const admin = fs.readFileSync('admin/index.html', 'utf8');
   const robots = fs.readFileSync('robots.txt', 'utf8');

@@ -81,7 +81,7 @@ check('prices flow into html, calculator config and json-ld', () => {
 check('default copy stays byte-for-byte with the original prices', () => {
   assert.match(html, /content="Клининг в Астане: влажная уборка от 400 ₸\/м², генеральная от 800, после ремонта от 850\. Своё оборудование и химия, заявки 24\/7, работаем по договору\."/);
   assert.match(html, /<h1 data-hero><span class="line"><span>Quality Клининг<\/span>/);
-  assert.match(html, /Quality Клининг Company \(Quality Cleaning\)/);
+  assert.match(html, /Quality Клининг Company \(Quality Cleaning, Куалити Клининг\)/);
   const business = buildLocalBusiness(content);
   assert.deepEqual(business.alternateName, content.brand.alternateName);
   assert.equal(buildFaqPage(content).mainEntity.length, content.faq.items.length);

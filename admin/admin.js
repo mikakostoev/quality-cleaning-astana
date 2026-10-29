@@ -20,6 +20,124 @@ const PRICE_FIELDS = [
 
 let content = null;
 let dirty = false;
+let compressing = 0;
+let redrawWorks = () => {};
+const pendingImages = new Map();
+
+function newWorkId() {
+  const used = new Set(content.works.map((work) => work.id));
+  const bytes = new Uint8Array(6);
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    crypto.getRandomValues(bytes);
+    const id = [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+    if (!used.has(id)) return id;
+  }
+  throw new Error('Не удалось создать карточку. Обновите страницу.');
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result || '');
+      const comma = text.indexOf(',');
+      resolve(comma >= 0 ? text.slice(comma + 1) : text);
+    };
+    reader.onerror = () => reject(new Error('Не удалось прочитать фото'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function canvasToJpeg(canvas, quality) {
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+}
+
+async function compressPhoto(file) {
+  if (!file || !String(file.type || '').startsWith('image/')) throw new Error('Нужно выбрать фото');
+  if (file.size > 25_000_000) throw new Error('Фото больше 25 МБ. Выберите другое.');
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    throw new Error('Этот формат не открылся. Выберите JPG, PNG или WEBP.');
+  }
+  try {
+    const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    let quality = 0.82;
+    let blob = await canvasToJpeg(canvas, quality);
+    while (blob && blob.size > 220_000 && quality > 0.52) {
+      quality = Math.round((quality - 0.08) * 100) / 100;
+      blob = await canvasToJpeg(canvas, quality);
+    }
+    if (!blob || blob.size > 260_000) throw new Error('Фото всё ещё слишком большое. Выберите другое.');
+    return { data: await blobToBase64(blob), preview: URL.createObjectURL(blob), portrait: height > width };
+  } finally {
+    bitmap.close?.();
+  }
+}
+
+function clearPending() {
+  for (const item of pendingImages.values()) {
+    if (item.preview) URL.revokeObjectURL(item.preview);
+  }
+  pendingImages.clear();
+}
+
+function shotSource(work, side) {
+  const item = pendingImages.get(`${work.id}:${side}`);
+  if (item?.preview) return item.preview;
+  if (work._persisted) return `/img/works/${work.id}-${side}.jpg?v=${work.rev || 1}`;
+  return '';
+}
+
+function hasShot(work, side) {
+  const item = pendingImages.get(`${work.id}:${side}`);
+  if (item?.data || item?.preview) return true;
+  return !!work._persisted;
+}
+
+function photoProblems() {
+  const problems = [];
+  let pending = 0;
+  for (const item of pendingImages.values()) if (item.data) pending += 1;
+  if (pending > 8) problems.push('За раз можно отправить не больше 8 фото. Опубликуйте эти и добавьте ещё.');
+  content.works.forEach((work, index) => {
+    const name = work.caption.trim() || `Работа ${index + 1}`;
+    if (!work.caption.trim()) problems.push(`${name}: напишите подпись`);
+    if (!hasShot(work, 'before')) problems.push(`${name}: добавьте фото «до»`);
+    if (!hasShot(work, 'after')) problems.push(`${name}: добавьте фото «после»`);
+  });
+  return problems;
+}
+
+function contentPayload() {
+  const payload = JSON.parse(JSON.stringify(content));
+  for (const work of payload.works || []) delete work._persisted;
+  return payload;
+}
+
+function uploadsPayload() {
+  const ids = new Set(content.works.map((work) => work.id));
+  const uploads = [];
+  for (const [key, item] of pendingImages) {
+    if (!item.data) continue;
+    const splitAt = key.lastIndexOf(':');
+    const id = key.slice(0, splitAt);
+    const side = key.slice(splitAt + 1);
+    if (!ids.has(id)) continue;
+    uploads.push({ id, side, data: item.data });
+  }
+  return uploads;
+}
 
 function h(tag, props, kids) {
   const node = document.createElement(tag);
@@ -87,9 +205,111 @@ function stringList(title, list, onChange, { addLabel }) {
   return { box, draw };
 }
 
+function worksSection() {
+  const box = h('div', { class: 'works-list' });
+  const draw = () => {
+    box.replaceChildren();
+    if (!content.works.length) {
+      box.append(h('p', { class: 'hint' }, ['Пока нет пар. Нажмите «Добавить работу» и выберите два фото.']));
+    }
+    content.works.forEach((work, index) => {
+      const shot = (side, label) => {
+        const src = shotSource(work, side);
+        const frame = h('div', { class: src ? 'shot-frame has-photo' : 'shot-frame' });
+        if (src) {
+          const img = h('img', { src, alt: label });
+          img.addEventListener('error', () => {
+            frame.replaceChildren(h('span', {}, ['Фото не открылось. Выберите ещё раз.']));
+          });
+          frame.append(img);
+        } else {
+          frame.append(h('span', {}, ['Выберите фото']));
+        }
+        const input = h('input', {
+          type: 'file',
+          accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif',
+          'aria-label': `Фото ${label}`,
+        });
+        const note = h('p', { class: 'hint' }, [src ? 'Можно заменить' : 'JPG, PNG или WEBP']);
+        input.addEventListener('change', async () => {
+          const file = input.files && input.files[0];
+          if (!file) return;
+          note.textContent = 'Сжимаем фото…';
+          input.disabled = true;
+          compressing += 1;
+          try {
+            const photo = await compressPhoto(file);
+            const key = `${work.id}:${side}`;
+            const prev = pendingImages.get(key);
+            if (prev?.preview && prev.preview !== photo.preview) URL.revokeObjectURL(prev.preview);
+            pendingImages.set(key, photo);
+            work.rev = Math.min(9999, (Number(work.rev) || 1) + 1);
+            if (side === 'after') work.portrait = photo.portrait;
+            dirty = true;
+            redrawWorks();
+          } catch (error) {
+            note.textContent = error.message || 'Не получилось прочитать фото';
+            input.disabled = false;
+          } finally {
+            compressing -= 1;
+          }
+        });
+        return h('div', { class: 'shot' }, [h('span', { class: 'shot-label' }, [label]), frame, input, note]);
+      };
+      const buttons = h('div', { class: 'row' }, [
+        h('button', { class: 'ghost', type: 'button' }, ['Выше']),
+        h('button', { class: 'ghost', type: 'button' }, ['Ниже']),
+        h('button', { class: 'danger', type: 'button' }, ['Удалить']),
+      ]);
+      box.append(h('div', { class: 'item' }, [
+        h('p', { class: 'hint' }, [`Пара ${index + 1}`]),
+        h('div', { class: 'pair' }, [shot('before', 'До'), shot('after', 'После')]),
+        field('Подпись на сайте', work.caption, (value) => { work.caption = value; }, { hint: 'Например: Кухня после генеральной' }),
+        buttons,
+      ]));
+      const all = buttons.querySelectorAll('button');
+      all[0].onclick = () => move(content.works, index, -1, draw);
+      all[1].onclick = () => move(content.works, index, 1, draw);
+      all[2].onclick = () => {
+        for (const side of ['before', 'after']) {
+          const item = pendingImages.get(`${work.id}:${side}`);
+          if (item?.preview) URL.revokeObjectURL(item.preview);
+          pendingImages.delete(`${work.id}:${side}`);
+        }
+        content.works.splice(index, 1);
+        dirty = true;
+        draw();
+      };
+    });
+    if (content.works.length >= 24) {
+      box.append(h('p', { class: 'hint' }, ['Уже 24 пары — это максимум. Удалите старую, чтобы добавить новую.']));
+      return;
+    }
+    const add = h('button', { class: 'ghost', type: 'button' }, ['Добавить работу']);
+    add.onclick = () => {
+      try {
+        content.works.push({ id: newWorkId(), caption: '', portrait: false, rev: 1, _persisted: false });
+      } catch (error) {
+        box.append(h('p', { class: 'msg bad' }, [error.message]));
+        return;
+      }
+      dirty = true;
+      draw();
+    };
+    box.append(add);
+  };
+  redrawWorks = draw;
+  draw();
+  return box;
+}
+
 function renderEditor(warning) {
   editor.replaceChildren();
   if (warning) editor.append(h('p', { class: 'msg bad' }, [warning]));
+  editor.append(section('Фото работ: до и после', [
+    h('p', { class: 'hint' }, ['Сфотографируйте объект до уборки и после. Пара появится в разделе «Наши работы» и в сравнении «До и после». Снимки с телефона уменьшаются сами. За один раз — не больше 4 новых пар.']),
+    worksSection(),
+  ], true));
   const prices = h('div', { class: 'price-grid' });
   for (const [key, label, unit] of PRICE_FIELDS) {
     const input = h('input', { type: 'text', inputmode: 'numeric', value: String(content.prices[key]) });
@@ -291,10 +511,21 @@ function renderEditor(warning) {
   const status = h('p', { class: 'msg', role: 'status' }, ['']);
   const publish = h('button', { class: 'primary', type: 'button' }, ['Опубликовать на сайт']);
   publish.onclick = async () => {
+    if (compressing > 0) {
+      status.className = 'msg';
+      status.textContent = 'Подождите, фото ещё сжимаются.';
+      return;
+    }
+    const problems = photoProblems();
+    if (problems.length) {
+      status.className = 'msg bad';
+      status.textContent = problems.slice(0, 4).join(' ');
+      return;
+    }
     status.className = 'msg';
     status.textContent = 'Публикуем…';
     publish.disabled = true;
-    const result = await api('/api/admin/content', { method: 'PUT', body: { content } });
+    const result = await api('/api/admin/content', { method: 'PUT', body: { content: contentPayload(), uploads: uploadsPayload() } });
     publish.disabled = false;
     if (!result.ok) {
       status.className = 'msg bad';
@@ -303,6 +534,8 @@ function renderEditor(warning) {
         : (result.data.error || 'Не получилось сохранить');
       return;
     }
+    for (const work of content.works) work._persisted = true;
+    for (const item of pendingImages.values()) item.data = null;
     dirty = false;
     status.className = 'msg ok';
     status.textContent = result.data.message || 'Сохранено';
@@ -341,6 +574,8 @@ async function enter() {
     return;
   }
   content = result.data.content;
+  if (!Array.isArray(content.works)) content.works = [];
+  for (const work of content.works) work._persisted = true;
   renderEditor(result.data.warning);
 }
 
@@ -361,6 +596,7 @@ loginForm.addEventListener('submit', async (event) => {
 
 logoutBtn.addEventListener('click', async () => {
   await api('/api/admin/logout', { method: 'POST', body: {} });
+  clearPending();
   content = null;
   editor.hidden = true;
   editor.replaceChildren();

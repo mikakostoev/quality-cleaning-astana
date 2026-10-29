@@ -15,8 +15,10 @@ if (current !== html) fs.writeFileSync(target, html);
 const out = path.join(root, 'public');
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out);
+// index.html is not copied: Vercel rewrites "/" to the page function, which
+// renders the latest server copy. A static index.html would hide those edits.
 const files = [
-  'index.html', 'styles.css', 'app.js', 'robots.txt', 'sitemap.xml',
+  'styles.css', 'app.js', 'robots.txt', 'sitemap.xml',
   'favicon.ico', 'favicon.svg', 'apple-touch-icon.png',
   'googlea86913d922ec07b4.html', 'yandex_4e8335a32fc2f611.html', 'BingSiteAuth.xml',
 ];

@@ -6,8 +6,8 @@ import { priceAnswer } from '../lib/prices.mjs';
 import { renderSite, siteConfig } from '../lib/render.mjs';
 import { checkPassword, isConfigured, resetRateLimit, verifySession } from '../lib/auth.mjs';
 import { getContent, login, putContent } from '../lib/admin-api.mjs';
-import { createGithub } from '../lib/github.mjs';
-import { bumpSitemap } from '../lib/publish.mjs';
+import { publishContent, renderLivePage } from '../lib/publish.mjs';
+import { writeStoredContent } from '../lib/store.mjs';
 
 let failed = 0;
 function check(name, fn) {
@@ -114,10 +114,10 @@ check('admin is noindex and absent from the sitemap', () => {
   assert.equal(fs.existsSync('BingSiteAuth.xml'), true);
 });
 
-check('sitemap lastmod bump keeps a single homepage url', () => {
-  const next = bumpSitemap(fs.readFileSync('sitemap.xml', 'utf8'), '2026-10-29');
-  assert.match(next, /<lastmod>2026-10-29<\/lastmod>/);
-  assert.equal(next.includes('/admin'), false);
+check('sitemap stays the homepage only', () => {
+  const sitemap = fs.readFileSync('sitemap.xml', 'utf8');
+  assert.match(sitemap, /quality-cleaning-astana\.vercel\.app\/</);
+  assert.equal(sitemap.includes('/admin'), false);
 });
 
 const host = { origin: 'http://127.0.0.1:4173', host: '127.0.0.1:4173', 'x-admin': '1' };
@@ -172,55 +172,36 @@ await checkAsync('login, wrong password, and a price save', async () => {
   const ld = JSON.parse(published.match(/<script type="application\/ld\+json">\n([\s\S]*?)\n<\/script>/)[1]);
   assert.equal(ld.hasOfferCatalog.itemListElement[0].priceSpecification.price, 450);
   assert.match(published, /Влажная — от 450 ₸\/м²/);
-  const noToken = await putContent({
+  const noStore = await putContent({
     method: 'PUT',
     headers: { ...host, cookie },
     body: { content: next },
     ip: '203.0.113.8',
     secure: false,
     now,
-  }, { publish: async () => { throw Object.assign(new Error('no'), { code: 'NO_TOKEN' }); } });
-  assert.equal(noToken.status, 503);
+  }, { publish: async () => { throw Object.assign(new Error('no'), { code: 'NO_STORE' }); } });
+  assert.equal(noStore.status, 503);
+  assert.match(noStore.body.error, /Blob/);
+  assert.equal(noStore.body.error.includes('GitHub'), false);
   delete process.env.ADMIN_PASSWORD;
 });
 
-await checkAsync('github client commits on the branch name with a slash', async () => {
-  process.env.CMS_BRANCH = 'mikakostoev/admin-panel-db3b';
-  process.env.CMS_GITHUB_REPO = 'mikakostoev/quality-cleaning-astana';
-  const calls = [];
-  const fetchImpl = async (url, options = {}) => {
-    calls.push({ url, method: options.method || 'GET', body: options.body ? JSON.parse(options.body) : null });
-    if (url.includes('/git/ref/heads/mikakostoev%2Fadmin-panel-db3b') && (options.method || 'GET') === 'GET') {
-      return json({ object: { sha: 'parent' } });
-    }
-    if (url.endsWith('/git/commits/parent')) return json({ tree: { sha: 'tree0' } });
-    if (url.includes('/git/blobs')) return json({ sha: 'blob1' });
-    if (url.includes('/git/trees')) return json({ sha: 'tree1' });
-    if (url.endsWith('/git/commits')) return json({ sha: 'commit1' });
-    if (url.includes('/git/refs/heads/mikakostoev%2Fadmin-panel-db3b') && options.method === 'PATCH') {
-      return json({ ref: 'ok' });
-    }
-    if (url.includes('/contents/content/site.json')) {
-      return json({ content: Buffer.from('{"ok":true}\n', 'utf8').toString('base64') });
-    }
-    return json({ message: 'nope' }, 404);
-  };
-  const github = createGithub({ token: 'test-token', fetchImpl });
-  const text = await github.readFile('content/site.json');
-  assert.equal(text, '{"ok":true}\n');
-  const result = await github.commit({
-    files: [{ path: 'content/site.json', content: '{}\n' }],
-    message: 'Обновление текстов и цен сайта',
-  });
-  assert.equal(result.sha, 'commit1');
-  assert.equal(calls.some((call) => call.url.includes('/git/refs/heads/mikakostoev%2Fadmin-panel-db3b')), true);
-  assert.equal(calls.some((call) => call.body?.force), false);
-  delete process.env.CMS_BRANCH;
+await checkAsync('server save writes the price without GitHub', async () => {
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  delete process.env.BLOB_STORE_ID;
+  delete process.env.CMS_LOCAL_PUBLISH;
+  await assert.rejects(() => writeStoredContent('{}'), (error) => error.code === 'NO_STORE');
+  const next = structuredClone(content);
+  next.prices.general = 810;
+  let stored = '';
+  const saved = await publishContent(next, async (json) => { stored = json; });
+  assert.match(saved.message, /сервере/);
+  const page = renderSite(JSON.parse(stored));
+  assert.match(page, /от <b>810<\/b> ₸\/м²/);
+  assert.match(page, /"general":810/);
+  const live = await renderLivePage();
+  assert.match(live, /от <b>400<\/b> ₸\/м²/);
 });
-
-function json(data, status = 200) {
-  return { ok: status < 300, status, text: async () => JSON.stringify(data) };
-}
 
 if (failed) {
   console.error(`\n${failed} failed`);

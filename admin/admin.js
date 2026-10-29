@@ -5,12 +5,16 @@ const loginForm = $('#login');
 const loginMsg = $('#login-msg');
 const setup = $('#setup');
 const logoutBtn = $('#logout');
+const jump = $('#jump');
+const dock = $('#dock');
+const saveBtn = $('#save');
+const saveMsg = $('#save-msg');
 
 const PRICE_FIELDS = [
-  ['wet', 'Влажная уборка', '₸ за м²'],
-  ['general', 'Генеральная уборка', '₸ за м²'],
-  ['renovation', 'После ремонта', '₸ за м²'],
-  ['moveout', 'Перед заселением', '₸ за м²'],
+  ['wet', 'Влажная уборка', '₸/м²'],
+  ['general', 'Генеральная уборка', '₸/м²'],
+  ['renovation', 'После ремонта', '₸/м²'],
+  ['moveout', 'Перед заселением', '₸/м²'],
   ['chem', 'Химчистка', '₸'],
   ['fridge', 'Холодильник', '₸'],
   ['hood', 'Вытяжка', '₸'],
@@ -55,8 +59,9 @@ function field(label, value, onInput, { area = false, hint = '', inputmode = '' 
   return wrap;
 }
 
-function section(title, nodes, open = false) {
-  const details = h('details', { class: 'block', ...(open ? { open: '' } : {}) });
+function section(title, nodes, options = false) {
+  const open = options === true || options.open;
+  const details = h('details', { class: 'block', ...(options.id ? { id: options.id } : {}), ...(open ? { open: '' } : {}) });
   details.append(h('summary', {}, [title]));
   details.append(h('div', { class: 'inner' }, nodes));
   return details;
@@ -88,32 +93,28 @@ function stringList(title, list, onChange, { addLabel }) {
 }
 
 function renderEditor(warning) {
+  const openIds = [...editor.querySelectorAll('details[open][id]')].map((node) => node.id);
+  const y = scrollY;
   editor.replaceChildren();
   if (warning) editor.append(h('p', { class: 'msg bad' }, [warning]));
-  const prices = h('div', { class: 'price-grid' });
+  const prices = h('div', { class: 'price-list' });
   for (const [key, label, unit] of PRICE_FIELDS) {
-    const input = h('input', { type: 'text', inputmode: 'numeric', value: String(content.prices[key]) });
-    const preview = h('p', { class: 'hint' }, []);
-    const paint = () => {
-      const n = Number(input.value.trim());
-      preview.textContent = Number.isInteger(n) && n > 0
-        ? (key === 'wet' || key === 'general' || key === 'renovation' || key === 'moveout' ? `На сайте: от ${n.toLocaleString('ru-RU')} ₸/м²` : `На сайте: от ${n.toLocaleString('ru-RU')} ₸`)
-        : 'Введите целое число больше нуля';
-    };
+    const input = h('input', { type: 'text', inputmode: 'numeric', enterkeyhint: 'done', autocomplete: 'off', value: String(content.prices[key]), 'aria-label': label });
     input.addEventListener('focus', () => input.select());
     input.addEventListener('input', () => {
       dirty = true;
       const n = Number(input.value.trim());
       if (Number.isInteger(n) && n > 0) content.prices[key] = n;
-      paint();
     });
-    paint();
-    prices.append(h('label', {}, [label, input, preview, h('span', { class: 'hint' }, [unit])]));
+    prices.append(h('div', { class: 'price-row' }, [
+      h('span', { class: 'price-name' }, [label]),
+      h('span', { class: 'price-box' }, [input, h('span', { class: 'price-unit' }, [unit])]),
+    ]));
   }
   editor.append(section('Цены', [
-    h('p', { class: 'hint' }, ['Эти цифры попадут на карточки услуг, в калькулятор, в ответы на вопросы и в данные для Google.']),
+    h('p', { class: 'hint' }, ['Цифра сразу попадает на сайт, в калькулятор и в Google.']),
     prices,
-  ], true));
+  ], { open: true, id: 'sec-prices' }));
 
   const phoneNodes = content.contacts.phones.map((phone, index) => {
     const box = h('div', { class: 'item' }, [
@@ -140,7 +141,7 @@ function renderEditor(warning) {
     field('Способы оплаты', content.contacts.payment, (value) => { content.contacts.payment = value; }),
     field('Ссылка на Instagram', content.contacts.instagram, (value) => { content.contacts.instagram = value; }),
     field('Ссылка на 2ГИС', content.contacts.gis, (value) => { content.contacts.gis = value; }),
-  ], true));
+  ], { open: true, id: 'sec-phones' }));
 
   editor.append(section('Первый экран', [
     field('Плашка', content.hero.pill, (value) => { content.hero.pill = value; }),
@@ -160,7 +161,7 @@ function renderEditor(warning) {
     field('Число оценок', String(content.stats.reviewCount), (value) => { content.stats.reviewCount = Number(value); }, { inputmode: 'numeric' }),
     field('Лет на рынке', String(content.stats.years), (value) => { content.stats.years = Number(value); }, { inputmode: 'numeric' }),
     field('Подпись к стажу', content.stats.yearsLabel, (value) => { content.stats.yearsLabel = value; }),
-  ]));
+  ], { id: 'sec-hero' }));
 
   const services = content.services.map((service, index) => h('div', { class: 'item' }, [
     h('p', { class: 'hint' }, [`Услуга ${index + 1}. Цена задаётся выше.`]),
@@ -171,7 +172,7 @@ function renderEditor(warning) {
     field('Подпись в калькуляторе', service.calcShort, (value) => { service.calcShort = value; }),
     field('Название в сообщении WhatsApp', service.calcName, (value) => { service.calcName = value; }),
   ]));
-  editor.append(section('Услуги', services));
+  editor.append(section('Услуги', services, { id: 'sec-services' }));
 
   const extras = content.extras.map((extra, index) => h('div', { class: 'item' }, [
     field('Название', extra.title, (value) => { extra.title = value; }),
@@ -222,7 +223,7 @@ function renderEditor(warning) {
     faqBox.append(add);
   };
   drawFaq();
-  editor.append(section('Вопросы и ответы', [faqBox]));
+  editor.append(section('Вопросы и ответы', [faqBox], { id: 'sec-faq' }));
 
   content.reviews.rows.forEach((row, rowIndex) => {
     const box = h('div');
@@ -254,7 +255,7 @@ function renderEditor(warning) {
     const reviewNodes = rowIndex === 0
       ? [field('Текст ссылки на 2ГИС', content.reviews.linkText, (value) => { content.reviews.linkText = value; }), box]
       : [box];
-    editor.append(section(`Отзывы, лента ${rowIndex + 1}`, reviewNodes));
+    editor.append(section(`Отзывы, лента ${rowIndex + 1}`, reviewNodes, rowIndex === 0 ? { id: 'sec-reviews' } : {}));
   });
 
   editor.append(section('Организации и застройщики', [
@@ -286,31 +287,38 @@ function renderEditor(warning) {
     field('Конец описания для соцсетей', content.seo.ogTail, (value) => { content.seo.ogTail = value; }),
     field('Начало короткого описания', content.seo.twitterLead, (value) => { content.seo.twitterLead = value; }),
     field('Конец короткого описания', content.seo.twitterTail, (value) => { content.seo.twitterTail = value; }),
-  ]));
+  ], { id: 'sec-more' }));
 
-  const status = h('p', { class: 'msg', role: 'status' }, ['']);
-  const publish = h('button', { class: 'primary', type: 'button' }, ['Опубликовать на сайт']);
-  publish.onclick = async () => {
-    status.className = 'msg';
-    status.textContent = 'Публикуем…';
-    publish.disabled = true;
-    const result = await api('/api/admin/content', { method: 'PUT', body: { content } });
-    publish.disabled = false;
-    if (!result.ok) {
-      status.className = 'msg bad';
-      status.textContent = result.data.fields?.length
-        ? `${result.data.error}: ${result.data.fields.slice(0, 4).join('; ')}`
-        : (result.data.error || 'Не получилось сохранить');
-      return;
-    }
-    dirty = false;
-    status.className = 'msg ok';
-    status.textContent = result.data.message || 'Сохранено';
-  };
-  editor.append(h('div', { class: 'publish' }, [publish, status]));
+  const links = [
+    ['sec-prices', 'Цены'],
+    ['sec-phones', 'Телефоны'],
+    ['sec-hero', 'Экран'],
+    ['sec-services', 'Услуги'],
+    ['sec-faq', 'Вопросы'],
+    ['sec-reviews', 'Отзывы'],
+    ['sec-more', 'Ещё'],
+  ];
+  jump.replaceChildren(...links.map(([id, label]) => {
+    const button = h('button', { type: 'button' }, [label]);
+    button.onclick = () => {
+      const target = document.getElementById(id);
+      if (!target) return;
+      target.open = true;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    return button;
+  }));
+  jump.hidden = false;
+  for (const id of openIds) {
+    const node = document.getElementById(id);
+    if (node) node.open = true;
+  }
+  if (openIds.length) scrollTo(0, y);
   logoutBtn.hidden = false;
   gate.hidden = true;
   editor.hidden = false;
+  dock.hidden = false;
+  document.body.classList.add('has-dock');
 }
 
 function move(list, index, dir, redraw) {
@@ -348,7 +356,11 @@ loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   loginMsg.textContent = 'Проверяем…';
   loginMsg.className = 'msg';
-  const result = await api('/api/admin/login', { method: 'POST', body: { password: new FormData(loginForm).get('password') } });
+  const form = new FormData(loginForm);
+  const result = await api('/api/admin/login', {
+    method: 'POST',
+    body: { login: form.get('login'), password: form.get('password') },
+  });
   if (!result.ok) {
     loginMsg.textContent = result.data.error || 'Не удалось войти';
     loginMsg.className = 'msg bad';
@@ -359,6 +371,24 @@ loginForm.addEventListener('submit', async (event) => {
   await enter();
 });
 
+saveBtn.addEventListener('click', async () => {
+  saveMsg.className = 'msg';
+  saveMsg.textContent = 'Сохраняем…';
+  saveBtn.disabled = true;
+  const result = await api('/api/admin/content', { method: 'PUT', body: { content } });
+  saveBtn.disabled = false;
+  if (!result.ok) {
+    saveMsg.className = 'msg bad';
+    saveMsg.textContent = result.data.fields?.length
+      ? `${result.data.error}: ${result.data.fields.slice(0, 3).join('; ')}`
+      : (result.data.error || 'Не получилось сохранить');
+    return;
+  }
+  dirty = false;
+  saveMsg.className = 'msg ok';
+  saveMsg.textContent = result.data.message || 'Сохранено';
+});
+
 logoutBtn.addEventListener('click', async () => {
   await api('/api/admin/logout', { method: 'POST', body: {} });
   content = null;
@@ -367,6 +397,22 @@ logoutBtn.addEventListener('click', async () => {
   gate.hidden = false;
   logoutBtn.hidden = true;
   loginForm.hidden = false;
+  jump.hidden = true;
+  dock.hidden = true;
+  saveMsg.textContent = '';
+  document.body.classList.remove('has-dock', 'editing');
+});
+
+document.addEventListener('focusin', (event) => {
+  if (!event.target.matches('input, textarea')) return;
+  document.body.classList.add('editing');
+  setTimeout(() => event.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
+});
+document.addEventListener('focusout', () => {
+  setTimeout(() => {
+    const active = document.activeElement;
+    if (!active || !active.matches('input, textarea')) document.body.classList.remove('editing');
+  }, 60);
 });
 
 addEventListener('beforeunload', (event) => {

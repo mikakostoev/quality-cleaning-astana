@@ -4,7 +4,7 @@ import { ContentError, normalizeContent } from '../lib/content.mjs';
 import { buildFaqPage, buildLocalBusiness } from '../lib/jsonld.mjs';
 import { priceAnswer } from '../lib/prices.mjs';
 import { renderSite, siteConfig } from '../lib/render.mjs';
-import { checkPassword, isConfigured, resetRateLimit, verifySession } from '../lib/auth.mjs';
+import { checkCredentials, isConfigured, resetRateLimit, verifySession } from '../lib/auth.mjs';
 import { getContent, login, putContent } from '../lib/admin-api.mjs';
 import { publishContent, renderLivePage } from '../lib/publish.mjs';
 import { writeStoredContent } from '../lib/store.mjs';
@@ -122,28 +122,39 @@ check('sitemap stays the homepage only', () => {
 
 const host = { origin: 'http://127.0.0.1:4173', host: '127.0.0.1:4173', 'x-admin': '1' };
 
-await checkAsync('password missing fails closed', async () => {
-  const previous = process.env.ADMIN_PASSWORD;
+await checkAsync('login or password missing fails closed', async () => {
+  const previousPassword = process.env.ADMIN_PASSWORD;
+  const previousLogin = process.env.ADMIN_LOGIN;
   delete process.env.ADMIN_PASSWORD;
+  delete process.env.ADMIN_LOGIN;
   resetRateLimit();
-  const entered = await login({ method: 'POST', headers: host, body: { password: 'whatever-password' }, ip: '203.0.113.5', secure: false, now: 1 });
+  const entered = await login({ method: 'POST', headers: host, body: { login: 'owner', password: 'whatever-password' }, ip: '203.0.113.5', secure: false, now: 1 });
   const loaded = await getContent({ method: 'GET', headers: host, ip: '203.0.113.5', secure: false, now: 1 });
   assert.equal(entered.status, 503);
   assert.equal(loaded.status, 503);
+  process.env.ADMIN_PASSWORD = 'correct-horse-battery';
   assert.equal(isConfigured(), false);
+  process.env.ADMIN_LOGIN = '   ';
+  assert.equal(isConfigured(), false);
+  process.env.ADMIN_LOGIN = 'owner';
   process.env.ADMIN_PASSWORD = 'short';
   assert.equal(isConfigured(), false);
-  process.env.ADMIN_PASSWORD = previous;
+  process.env.ADMIN_PASSWORD = previousPassword;
+  process.env.ADMIN_LOGIN = previousLogin;
 });
 
 await checkAsync('login, wrong password, and a price save', async () => {
+  process.env.ADMIN_LOGIN = 'owner';
   process.env.ADMIN_PASSWORD = 'correct-horse-battery';
   resetRateLimit();
   const now = Date.now();
-  const bad = await login({ method: 'POST', headers: host, body: { password: 'not-the-password' }, ip: '203.0.113.8', secure: false, now });
-  assert.equal(bad.status, 401);
-  assert.equal(checkPassword('correct-horse-battery'), true);
-  const good = await login({ method: 'POST', headers: host, body: { password: 'correct-horse-battery' }, ip: '203.0.113.8', secure: false, now });
+  const badPassword = await login({ method: 'POST', headers: host, body: { login: 'owner', password: 'not-the-password' }, ip: '203.0.113.8', secure: false, now });
+  const badLogin = await login({ method: 'POST', headers: host, body: { login: 'other', password: 'correct-horse-battery' }, ip: '203.0.113.9', secure: false, now });
+  assert.equal(badPassword.status, 401);
+  assert.equal(badLogin.status, 401);
+  assert.equal(badPassword.body.error, badLogin.body.error);
+  assert.equal(checkCredentials('owner', 'correct-horse-battery'), true);
+  const good = await login({ method: 'POST', headers: host, body: { login: ' owner ', password: 'correct-horse-battery' }, ip: '203.0.113.8', secure: false, now });
   assert.equal(good.status, 200);
   const cookie = good.headers['Set-Cookie'].split(';')[0];
   assert.equal(verifySession(decodeURIComponent(cookie.split('=')[1]), now), true);
@@ -184,6 +195,7 @@ await checkAsync('login, wrong password, and a price save', async () => {
   assert.match(noStore.body.error, /Blob/);
   assert.equal(noStore.body.error.includes('GitHub'), false);
   delete process.env.ADMIN_PASSWORD;
+  delete process.env.ADMIN_LOGIN;
 });
 
 await checkAsync('server save writes the price without GitHub', async () => {

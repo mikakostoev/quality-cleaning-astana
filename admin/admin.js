@@ -3,6 +3,15 @@ const gate = $('#gate');
 const editor = $('#editor');
 const loginForm = $('#login');
 const loginMsg = $('#login-msg');
+const credentials = $('#credentials');
+const otpStep = $('#otp-step');
+const otpHint = $('#otp-hint');
+const loginInput = $('#login-name');
+const passwordInput = $('#password');
+const codeInput = $('#code');
+const submitBtn = $('#login-submit');
+const resendBtn = $('#resend');
+const backBtn = $('#back-login');
 const setup = $('#setup');
 const logoutBtn = $('#logout');
 
@@ -554,6 +563,48 @@ function move(list, index, dir, redraw) {
   redraw();
 }
 
+function showCredentials() {
+  credentials.hidden = false;
+  otpStep.hidden = true;
+  loginInput.disabled = false;
+  passwordInput.disabled = false;
+  codeInput.disabled = true;
+  codeInput.value = '';
+  submitBtn.textContent = 'Продолжить';
+  otpHint.textContent = '';
+}
+
+function showOtp(email) {
+  credentials.hidden = true;
+  otpStep.hidden = false;
+  loginInput.disabled = true;
+  passwordInput.disabled = true;
+  codeInput.disabled = false;
+  submitBtn.textContent = 'Войти';
+  otpHint.textContent = email
+    ? `Код отправлен на ${email}. Он действует 10 минут.`
+    : 'Код отправлен на почту. Он действует 10 минут.';
+  codeInput.focus();
+}
+
+async function requestCode(body) {
+  loginMsg.textContent = 'Отправляем код…';
+  loginMsg.className = 'msg';
+  const result = await api('/api/admin/login', { method: 'POST', body });
+  if (result.ok && result.data.step === 'otp') {
+    const fresh = otpStep.hidden || result.data.sent === true;
+    showOtp(result.data.email);
+    if (fresh) codeInput.value = '';
+    loginMsg.textContent = result.data.sent === false ? 'Код уже отправлен. Проверьте почту.' : '';
+    loginMsg.className = 'msg';
+    return true;
+  }
+  loginMsg.textContent = result.data.error || 'Не удалось отправить код';
+  loginMsg.className = 'msg bad';
+  if (result.data.step === 'credentials') showCredentials();
+  return false;
+}
+
 async function enter() {
   const result = await api('/api/admin/content');
   if (result.status === 503) {
@@ -566,6 +617,8 @@ async function enter() {
     gate.hidden = false;
     editor.hidden = true;
     logoutBtn.hidden = true;
+    loginForm.hidden = false;
+    showCredentials();
     return;
   }
   if (!result.ok) {
@@ -581,17 +634,48 @@ async function enter() {
 
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  loginMsg.textContent = 'Проверяем…';
-  loginMsg.className = 'msg';
-  const result = await api('/api/admin/login', { method: 'POST', body: { password: new FormData(loginForm).get('password') } });
-  if (!result.ok) {
-    loginMsg.textContent = result.data.error || 'Не удалось войти';
-    loginMsg.className = 'msg bad';
-    return;
+  submitBtn.disabled = true;
+  resendBtn.disabled = true;
+  try {
+    if (!otpStep.hidden) {
+      loginMsg.textContent = 'Проверяем код…';
+      loginMsg.className = 'msg';
+      const result = await api('/api/admin/login', { method: 'POST', body: { code: codeInput.value } });
+      if (!result.ok) {
+        loginMsg.textContent = result.data.error || 'Не удалось войти';
+        loginMsg.className = 'msg bad';
+        if (result.data.step === 'credentials') showCredentials();
+        return;
+      }
+      codeInput.value = '';
+      loginMsg.textContent = '';
+      loginMsg.className = 'msg';
+      await enter();
+      return;
+    }
+    const sent = await requestCode({ login: loginInput.value, password: passwordInput.value });
+    if (sent) passwordInput.value = '';
+  } finally {
+    submitBtn.disabled = false;
+    resendBtn.disabled = false;
   }
-  loginForm.reset();
+});
+
+resendBtn.addEventListener('click', async () => {
+  submitBtn.disabled = true;
+  resendBtn.disabled = true;
+  try {
+    await requestCode({ resend: true });
+  } finally {
+    submitBtn.disabled = false;
+    resendBtn.disabled = false;
+  }
+});
+
+backBtn.addEventListener('click', () => {
+  showCredentials();
   loginMsg.textContent = '';
-  await enter();
+  loginMsg.className = 'msg';
 });
 
 logoutBtn.addEventListener('click', async () => {
@@ -603,6 +687,10 @@ logoutBtn.addEventListener('click', async () => {
   gate.hidden = false;
   logoutBtn.hidden = true;
   loginForm.hidden = false;
+  loginForm.reset();
+  showCredentials();
+  loginMsg.textContent = '';
+  loginMsg.className = 'msg';
 });
 
 addEventListener('beforeunload', (event) => {

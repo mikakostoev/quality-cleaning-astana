@@ -71,7 +71,11 @@ input:focus, textarea:focus, select:focus { outline: 3px solid #b9dcff; border-c
   cursor: pointer;
 }
 .primary { background: var(--navy); color: #fff; }
-.gate .primary { width: 100%; margin-top: 4px; }
+.gate form, #credentials, #otp-step { display: grid; gap: 12px; }
+#credentials[hidden], #otp-step[hidden] { display: none; }
+.gate .primary, .gate .ghost { width: 100%; }
+.gate .primary { margin-top: 4px; }
+button:disabled { opacity: .6; cursor: wait; }
 .ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--line); }
 .danger { background: #fff; color: var(--danger); border: 1.5px solid #f0c4c8; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; }

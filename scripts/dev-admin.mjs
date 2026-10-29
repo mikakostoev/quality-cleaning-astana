@@ -7,6 +7,13 @@ import { handle } from '../lib/node-handler.mjs';
 
 process.env.CMS_LOCAL_PUBLISH = '1';
 
+const missingLogin = ['ADMIN_LOGIN', 'ADMIN_PASSWORD', 'ADMIN_EMAIL'].filter((key) => !process.env[key]);
+if (missingLogin.length) {
+  console.log(`admin login needs ${missingLogin.join(', ')}`);
+} else if (!process.env.RESEND_API_KEY) {
+  console.log('admin OTP prints in this terminal until RESEND_API_KEY and RESEND_FROM are set');
+}
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const port = Number(process.env.PORT || 4173);
 const types = {

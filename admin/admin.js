@@ -99,14 +99,16 @@ function renderEditor(warning) {
   if (warning) editor.append(h('p', { class: 'msg bad' }, [warning]));
   const prices = h('div', { class: 'price-list' });
   for (const [key, label, unit] of PRICE_FIELDS) {
-    const input = h('input', { type: 'text', inputmode: 'numeric', enterkeyhint: 'done', autocomplete: 'off', value: String(content.prices[key]), 'aria-label': label });
+    const input = h('input', { type: 'text', inputmode: 'numeric', enterkeyhint: 'done', autocomplete: 'off', value: String(content.prices[key]) });
     input.addEventListener('focus', () => input.select());
     input.addEventListener('input', () => {
       dirty = true;
       const n = Number(input.value.trim());
-      if (Number.isInteger(n) && n > 0) content.prices[key] = n;
+      const ok = Number.isInteger(n) && n > 0;
+      input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+      if (ok) content.prices[key] = n;
     });
-    prices.append(h('div', { class: 'price-row' }, [
+    prices.append(h('label', { class: 'price-row' }, [
       h('span', { class: 'price-name' }, [label]),
       h('span', { class: 'price-box' }, [input, h('span', { class: 'price-unit' }, [unit])]),
     ]));
@@ -303,8 +305,12 @@ function renderEditor(warning) {
     button.onclick = () => {
       const target = document.getElementById(id);
       if (!target) return;
+      for (const item of jump.querySelectorAll('button')) item.removeAttribute('aria-current');
+      button.setAttribute('aria-current', 'true');
       target.open = true;
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const head = document.querySelector('.sticky-head');
+      const top = target.getBoundingClientRect().top + window.scrollY - (head?.offsetHeight || 0) - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     };
     return button;
   }));
@@ -341,6 +347,9 @@ async function enter() {
     gate.hidden = false;
     editor.hidden = true;
     logoutBtn.hidden = true;
+    jump.hidden = true;
+    dock.hidden = true;
+    document.body.classList.remove('has-dock', 'editing');
     return;
   }
   if (!result.ok) {
@@ -403,17 +412,40 @@ logoutBtn.addEventListener('click', async () => {
   document.body.classList.remove('has-dock', 'editing');
 });
 
+function revealField(field) {
+  if (!field?.isConnected) return;
+  const rect = field.getBoundingClientRect();
+  const headBottom = document.querySelector('.sticky-head')?.getBoundingClientRect().bottom ?? 0;
+  const viewHeight = window.visualViewport?.height || window.innerHeight;
+  const topLimit = headBottom + 8;
+  const bottomLimit = viewHeight - 12;
+  if (rect.top < topLimit) window.scrollBy({ top: rect.top - topLimit, behavior: 'auto' });
+  else if (rect.bottom > bottomLimit) window.scrollBy({ top: rect.bottom - bottomLimit, behavior: 'auto' });
+}
+
+let revealTimer = 0;
+function scheduleReveal(field) {
+  clearTimeout(revealTimer);
+  revealTimer = setTimeout(() => revealField(field), 40);
+}
+
 document.addEventListener('focusin', (event) => {
   if (!event.target.matches('input, textarea')) return;
   document.body.classList.add('editing');
-  setTimeout(() => event.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
+  scheduleReveal(event.target);
 });
 document.addEventListener('focusout', () => {
   setTimeout(() => {
     const active = document.activeElement;
-    if (!active || !active.matches('input, textarea')) document.body.classList.remove('editing');
+    if (!active?.matches?.('input, textarea')) document.body.classList.remove('editing');
   }, 60);
 });
+if (window.visualViewport) {
+  visualViewport.addEventListener('resize', () => {
+    const active = document.activeElement;
+    if (active?.matches?.('input, textarea')) scheduleReveal(active);
+  });
+}
 
 addEventListener('beforeunload', (event) => {
   if (!dirty) return;

@@ -10,16 +10,22 @@
 <link rel="stylesheet" href="/admin/admin.css">
 </head>
 <body>
+<div class="sticky-head">
 <header class="top">
   <div>
     <p class="eyebrow">Quality Клининг</p>
-    <h1>Редактирование сайта</h1>
+    <h1>Правка сайта</h1>
   </div>
   <button class="ghost" type="button" id="logout" hidden>Выйти</button>
 </header>
+<nav class="jump" id="jump" hidden></nav>
+</div>
 <main>
   <section class="card gate" id="gate">
     <form id="login" method="post" action="/admin">
+      <label>Логин
+        <input name="login" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+      </label>
       <label>Пароль
         <input name="password" type="password" autocomplete="current-password" required>
       </label>
@@ -30,6 +36,10 @@
   </section>
   <section id="editor" hidden></section>
 </main>
+<div class="dock" id="dock" hidden>
+  <p class="msg" id="save-msg" role="status"></p>
+  <button class="primary" type="button" id="save">Опубликовать</button>
+</div>
 <noscript><p class="msg bad">Чтобы пользоваться админкой, включите JavaScript.</p></noscript>
 <script src="/admin/admin.js"></script>
 </body>

@@ -6,7 +6,15 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
 const G = window.gsap && window.ScrollTrigger ? window.gsap : null;
 const motion = G && !reduce;
-const WA = 'https://wa.me/77779527961?text=';
+const siteConfig = (() => {
+  try {
+    const el = document.getElementById('site-config');
+    return el ? JSON.parse(el.textContent) : null;
+  } catch {
+    return null;
+  }
+})();
+const WA = 'https://wa.me/' + (siteConfig?.whatsapp || '77779527961') + '?text=';
 
 // WhatsApp-ссылки сразу с приветствием
 $$('[data-wa]').forEach(a => { a.href = WA + encodeURIComponent(a.dataset.wa || 'Здравствуйте! Хочу заказать уборку.'); });
@@ -65,8 +73,8 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- калькулятор ---------- */
-const PRICES = { wet: 400, general: 800, renovation: 850, moveout: 850 };
-const NAMES = { wet: 'Влажная уборка', general: 'Генеральная уборка', renovation: 'Уборка после ремонта', moveout: 'Уборка после прежних жильцов' };
+const PRICES = siteConfig?.prices || { wet: 400, general: 800, renovation: 850, moveout: 850 };
+const NAMES = siteConfig?.names || { wet: 'Влажная уборка', general: 'Генеральная уборка', renovation: 'Уборка после ремонта', moveout: 'Уборка после прежних жильцов' };
 const form = $('#calc-form'), range = $('#area'), num = $('#area-num'), out = $('#total');
 const fmt = n => Math.round(n).toLocaleString('ru-RU');
 const shown = { v: 0 };
@@ -104,7 +112,8 @@ $$('[data-pick]').forEach(b => b.addEventListener('click', () => {
   if (motion) gsap.fromTo('.calc', { scale: .97 }, { scale: 1, duration: 1, delay: 1.1, ease: 'elastic.out(1, .45)' });
 }));
 $$('[data-chem]').forEach(b => b.addEventListener('click', () => {
-  form.querySelector('[data-price="2000"]').checked = true;
+  const chem = form.querySelector('[data-extra="chem"]');
+  if (chem) chem.checked = true;
   render();
   scrollToEl($('#calc'));
 }));

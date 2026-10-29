@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>%%SEO_TITLE%%</title>
+<meta name="description" content="%%SEO_DESCRIPTION%%">
+<meta name="theme-color" content="#14365f">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="%%BRAND%%">
+<link rel="canonical" href="https://quality-cleaning-astana.vercel.app/">
+<meta property="og:url" content="https://quality-cleaning-astana.vercel.app/">
+<meta property="og:title" content="%%OG_TITLE%%">
+<meta property="og:description" content="%%OG_DESCRIPTION%%">
+<meta property="og:image" content="https://quality-cleaning-astana.vercel.app/img/g-chandelier.jpg">
+<meta property="og:image:alt" content="%%OG_IMAGE_ALT%%">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="%%TW_TITLE%%">
+<meta name="twitter:description" content="%%TW_DESCRIPTION%%">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<link rel="preload" as="image" href="img/hero.jpg" fetchpriority="high">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&amp;family=Caveat:wght@700&amp;display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>
+(function(){var d=document.documentElement;d.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('anim');
+setTimeout(function(){d.classList.remove('anim')},6000)})();
+</script>
+<script type="application/ld+json">
+%%LD_BUSINESS%%
+</script>
+<script type="application/ld+json">
+%%LD_FAQ%%
+</script>
+<script type="application/ld+json">
+%%LD_WEBSITE%%
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+<script type="application/json" id="site-config">%%SITE_CONFIG%%</script>
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+  </defs>
+  <symbol id="i-learn" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 9v6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="i-broom" viewBox="0 0 24 24"><path d="M20 3.5 12.5 11"/><path d="M12.5 11c-2.2-1.4-5-.6-6.1 1.6L3.5 20c3.6.4 7.4-.6 9.3-3.3 1.4-1.9 1.4-4.2-.3-5.7Z"/><path d="M6.6 15.6 9 18M8.4 13.4l2.8 2.8"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M10 3.5l1.9 5.1L17 10.5l-5.1 1.9L10 17.5l-1.9-5.1L3 10.5l5.1-1.9Z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z"/></symbol>
+  <symbol id="i-helmet" viewBox="0 0 24 24"><path d="M3 17.5h18v2.5H3z"/><path d="M4.5 17.5a7.5 7.5 0 0 1 15 0"/><path d="M10 10.5V5.8h4v4.7"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5.5 9.5V20H11"/><circle cx="16" cy="13.5" r="2.6"/><path d="M16 16.1V21M16 19h2"/></symbol>
+  <symbol id="i-window" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M4 12h16"/><path d="M14.8 6l2.2 2.2"/></symbol>
+  <symbol id="i-ceiling" viewBox="0 0 24 24"><path d="M3 4.5h18"/><path d="M12 4.5V9"/><path d="M6.5 15a5.5 5.5 0 0 1 11 0Z"/><path d="M10.5 18.5h3"/></symbol>
+  <symbol id="i-curtain" viewBox="0 0 24 24"><path d="M3 3.5h18"/><path d="M5 3.5V21c2.6-2.8 3.8-8 4-17.5M19 3.5V21c-2.6-2.8-3.8-8-4-17.5"/><path d="M8 13.5c1.5.5 2.5.5 3.5 0"/></symbol>
+  <symbol id="i-ozone" viewBox="0 0 24 24"><path d="M7 18.5a4.2 4.2 0 0 1-.6-8.4 5.8 5.8 0 0 1 11.2 1.6 3.4 3.4 0 0 1-.4 6.8Z"/><circle cx="10" cy="14" r="1.6"/><path d="M13.2 13.2c.4-.6 1.8-.6 1.8.3 0 .8-1.8 1.4-1.8 2h1.9"/></symbol>
+  <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3Z"/><path d="M5 18v2M19 18v2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4.3A8.6 8.6 0 1 1 8 19.3Z"/><path d="M9 8.3c-.2 3.5 3.2 6.9 6.7 6.7l.9-1.7-2.2-1-1 .9a5 5 0 0 1-2.6-2.6l.9-1-1-2.2Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6Z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9-9.5C2 6.8 4.3 4 7.3 4c2 0 3.5 1.2 4.7 2.8C13.2 5.2 14.7 4 16.7 4c3 0 5.3 2.8 4.3 6.5-1.5 4.9-9 9.5-9 9.5Z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9Z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".9" fill="currentColor"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-fridge" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M6 10h12M9 6v2M9 13v3"/></symbol>
+  <symbol id="i-cooktop" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2.5"/><circle cx="15.5" cy="12" r="2.5"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="6.2" r="1.8"/><circle cx="14.5" cy="6.2" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M8 17c0-2.8 2-5 4.3-5s4.2 2.2 4.2 5c0 1.8-1.3 2.8-2.7 2.8-.9 0-1-.5-1.6-.5s-.8.5-1.7.5C9.3 19.8 8 18.8 8 17Z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-door" viewBox="0 0 24 24"><path d="M6 21V3h12v18"/><path d="M3 21h18"/><path d="M14.5 12h.01"/></symbol>
+  <symbol id="i-bath" viewBox="0 0 24 24"><path d="M4 12h16v3a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5Z"/><path d="M6 12V5.5A2.5 2.5 0 0 1 10.5 4"/><path d="M7 20l-1 1.5M17 20l1 1.5"/></symbol>
+  <symbol id="i-vacuum" viewBox="0 0 24 24"><circle cx="8" cy="16.5" r="3.5"/><path d="M11.5 16.5H20v-2.5a4 4 0 0 0-4-4h-2"/><path d="M14 10 18.5 3"/><path d="M5 20.5h14"/></symbol>
+  <symbol id="i-usercheck" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M3 20a7 7 0 0 1 11-5.7"/><path d="M15 18l2 2 4-4"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19c3-4 6-7 10-9"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M4 21V5l8-2v18M12 8h8v13"/><path d="M7 8h2M7 12h2M7 16h2M15 12h2M15 16h2M2 21h20"/></symbol>
+  <symbol id="i-squeegee" viewBox="0 0 24 24"><path d="M5 7.5l14-4"/><path d="M12 5.5l1.2 4"/><path d="M13.2 9.5 16 20"/></symbol>
+</svg>
+
+
+<header class="header">
+  <div class="wrap header-in">
+    <a class="logo" href="#top" aria-label="%%BRAND%% — на главную"><img decoding="async" src="img/logo.png" alt="%%BRAND%%" width="288" height="268"></a>
+    <nav class="nav" id="nav" aria-label="Меню">
+      <a href="#services">Услуги</a>
+      <a href="#checklist">Что входит</a>
+      <a href="#calc">Цены</a>
+      <a href="#works">Наши работы</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="https://wa.me/%%WA%%" data-wa="Здравствуйте! Интересует обучение по направлению клининга. Расскажите, пожалуйста, подробнее." target="_blank" rel="noopener">Обучение</a>
+      <a href="#contacts">Контакты</a>
+      <a class="nav-phone" href="tel:%%PHONE1%%">%%PHONE1_DISPLAY%%</a>
+    </nav>
+    <a class="header-phone" href="tel:%%PHONE1%%"><svg class="ic"><use href="#i-phone"/></svg>%%PHONE1_DISPLAY%%</a>
+    <a class="btn btn-primary btn-sm header-cta magnet" href="#calc">Заказать уборку</a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Меню"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <img decoding="async" class="hero-bg" src="img/hero-bg-900.jpg" srcset="img/hero-bg-900.jpg 900w, img/hero-bg-1400.jpg 1400w" sizes="100vw" fetchpriority="high" alt="">
+  <div class="hero-veil"></div>
+  <div class="bubbles" aria-hidden="true">
+    <i style="--x:6%;--s:46px;--d:15s;--dl:-2s"></i><i style="--x:22%;--s:22px;--d:11s;--dl:-7s"></i><i style="--x:38%;--s:64px;--d:19s;--dl:-11s"></i>
+    <i style="--x:55%;--s:30px;--d:13s;--dl:-4s"></i><i style="--x:70%;--s:52px;--d:17s;--dl:-9s"></i><i style="--x:86%;--s:26px;--d:12s;--dl:-1s"></i><i style="--x:95%;--s:40px;--d:16s;--dl:-13s"></i>
+  </div>
+  <div class="wrap hero-in">
+    <div class="hero-copy">
+      <p class="hero-pill" data-hero><span class="dot"></span>%%HERO_PILL%%</p>
+      <h1 data-hero><span class="line"><span>%%H1_1%%</span></span><span class="line"><span>%%H1_2%%</span></span><span class="line"><span>%%H1_3%%</span></span><span class="line big"><span>%%H1_4%%</span></span></h1>
+      <p class="script" data-hero>%%HERO_SCRIPT%% <svg class="ic heart"><use href="#i-heart"/></svg><svg class="swoosh" viewBox="0 0 300 20" preserveAspectRatio="none"><path pathLength="1" d="M3 15C80 5 190 2 297 9"/></svg></p>
+      <p class="hero-lead" data-hero>%%HERO_LEAD%%</p>
+      <div class="hero-cta" data-hero>
+        <a class="btn btn-primary btn-lg btn-shine magnet" href="#calc"><svg class="ic"><use href="#i-calc"/></svg>Рассчитать стоимость</a>
+        <a class="btn btn-ghost btn-lg magnet" href="https://wa.me/%%WA%%" data-wa target="_blank" rel="noopener"><svg class="ic wa-ic"><use href="#i-wa"/></svg>Написать в WhatsApp</a>
+        <a class="btn btn-ghost btn-lg magnet" href="https://wa.me/%%WA%%" data-wa="Здравствуйте! Интересует обучение по направлению клининга. Расскажите, пожалуйста, подробнее." target="_blank" rel="noopener"><svg class="ic"><use href="#i-learn"/></svg>Обучение по направлению клининга</a>
+        <a class="btn btn-ghost btn-lg magnet" href="#business"><svg class="ic"><use href="#i-building"/></svg>Договор для организаций</a>
+        <a class="btn btn-ghost btn-lg magnet" href="#developers"><svg class="ic"><use href="#i-key"/></svg>Для застройщиков</a>
+      </div>
+      <div class="hero-checks"><span class="hero-checks-label"><svg class="ic"><use href="#i-list"/></svg>Что входит в уборку</span><div class="hero-checks-btns"><button type="button" data-cl="general">Генеральная</button><button type="button" data-cl="moveout">Перед заселением</button><button type="button" data-cl="renovation">После ремонта</button><button type="button" data-cl="wet">Влажная</button></div></div>
+      <ul class="hero-trust" data-hero>
+        <li><span class="stars hero-stars" aria-hidden="true"><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg></span><span class="hero-rate"><b>%%RATING%%</b> %%RATING_NOTE%%</span></li>
+        <li><svg class="ic"><use href="#i-card"/></svg>%%PAYMENT%%</li>
+      </ul>
+    </div>
+    <div class="hero-visual" data-hero>
+      <div class="arch"><img decoding="async" src="img/hero.jpg" alt="%%HERO_ALT%%" width="615" height="820" fetchpriority="high"></div>
+      <div class="chip chip-rating" data-depth="26"><svg class="ic"><use href="#i-star"/></svg><span><b>%%RATING%%</b><br>%%CHIP_REVIEWS%%</span></div>
+      <div class="chip chip-years" data-depth="-30"><b>%%YEARS%% лет</b><span>%%YEARS_LABEL%%</span></div>
+      <div class="chip chip-247" data-depth="18"><svg class="ic"><use href="#i-clock"/></svg><span>Заявки<br><b>24/7</b></span></div>
+      <span class="spark s1" data-depth="40">✦</span><span class="spark s2" data-depth="-24">✦</span><span class="spark s3" data-depth="32">✦</span>
+    </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C240 120 480 8 720 40s480 88 720 16v64H0Z"/></svg>
+</section>
+
+<section class="section bg-ice" id="business">
+  <div class="wrap">
+    <div class="b2b card" data-reveal>
+      <div class="b2b-img b2b-collage">
+        <div class="c-a"><img decoding="async" src="img/g-shower.jpg" alt="Клинер моет душевую кабину" loading="lazy"></div>
+        <div class="c-b"><span data-l="До"><img decoding="async" src="img/d-stairs-before.jpg" alt="Лестница в строительной пыли" loading="lazy"></span><span data-l="После"><img decoding="async" src="img/d-stairs-after.jpg" alt="Чистая лестница" loading="lazy"></span></div>
+        <div class="c-c"><img decoding="async" src="img/g-crystal.jpg" alt="Чистая хрустальная люстра" loading="lazy"></div>
+      </div>
+      <div class="b2b-copy">
+        <p class="eyebrow"><span class="eb-ic"><svg class="ic"><use href="#i-building"/></svg></span>Для организаций</p>
+        <h2>%%B2B_TITLE%%</h2>
+        <p>%%B2B_LEAD%%</p>
+        <ul class="tags b2b-tags">
+          <li>Детские сады</li><li>Бизнес-центры</li><li>Офисы</li><li>Медцентры</li><li>Больницы</li><li>Крупные организации</li><li>Спортивные объекты</li>
+        </ul>
+        <p>%%B2B_EXAMPLE%%</p>
+        <div class="b2b-btns">
+          <a class="btn btn-primary magnet" href="https://wa.me/%%WA%%" data-wa="Здравствуйте! Интересует договор на обслуживание организации." target="_blank" rel="noopener"><svg class="ic"><use href="#i-wa"/></svg>Обсудить договор</a>
+          <a class="link-btn" href="https://www.instagram.com/reel/C1aEMgKrSAp/" target="_blank" rel="noopener">Видео уборки в Instagram <svg class="ic"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="b2b b2b-flip card" id="developers" data-reveal>
+      <div class="b2b-copy">
+        <p class="eyebrow"><span class="eb-ic"><svg class="ic"><use href="#i-building"/></svg></span>Для застройщиков</p>
+        <h3 class="b2b-title">%%DEV_TITLE%%</h3>
+        <p>%%DEV_LEAD%%</p>
+        <ul class="tags b2b-tags">
+          <li>Подъезды</li><li>Лестничные площадки</li><li>Места общего пользования</li>
+        </ul>
+        <div class="mop-photo"><img decoding="async" src="img/mop.jpg" alt="Уборка МОП в новостройках: коридор и лестничная площадка до и после" loading="lazy"></div>
+        <div class="b2b-btns">
+          <a class="btn btn-primary magnet" href="https://wa.me/%%WA%%" data-wa="Здравствуйте! Интересует уборка МОП в новостройке перед сдачей объекта." target="_blank" rel="noopener"><svg class="ic"><use href="#i-wa"/></svg>Обсудить объект</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="works">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-camera"/></svg></span>Живые фото</p>
+      <h2 data-split>Наши работы — <em>без фильтров</em></h2>
+      <p class="sec-sub" data-reveal>Фото с наших объектов: команда за работой и результат. Нажмите, чтобы рассмотреть.</p>
+    </div>
+    <div class="gallery" data-stagger>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-chandelier.jpg" alt="Клинер моет люстру с хрустальными подвесками" loading="lazy"><span class="cap">Люстры моем, не снимая</span></button>
+      <button class="g-tile wide tall duo" type="button"><span data-l="До"><img decoding="async" src="img/d-room-before.jpg" alt="Комната после ремонта до уборки" loading="lazy"></span><span data-l="После"><img decoding="async" src="img/d-room-after.jpg" alt="Комната после уборки" loading="lazy"></span><span class="cap">Уборка после ремонта</span></button>
+      <button class="g-tile" type="button"><img decoding="async" src="img/g-bath.jpg" alt="Клинер отмывает тумбу в ванной" loading="lazy"><span class="cap">Санузел до блеска</span></button>
+      <button class="g-tile" type="button"><img decoding="async" src="img/g-window.jpg" alt="Клинер моет панорамное окно" loading="lazy"><span class="cap">Окна и откосы</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-shower.jpg" alt="Клинер моет душевую кабину" loading="lazy"><span class="cap">Душевые кабины</span></button>
+      <button class="g-tile wide tall duo" type="button"><span data-l="До"><img decoding="async" src="img/d-stairs-before.jpg" alt="Лестница в строительной пыли" loading="lazy"></span><span data-l="После"><img decoding="async" src="img/d-stairs-after.jpg" alt="Чистая лестница" loading="lazy"></span><span class="cap">Лестница после ремонта</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-crystal.jpg" alt="Чистая хрустальная люстра" loading="lazy"><span class="cap">Хрусталь сияет</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-kitchen.jpg" alt="Чистая белая кухня" loading="lazy"><span class="cap">Кухня после генеральной</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-table.jpg" alt="Клинер протирает стол" loading="lazy"><span class="cap">Мебель и поверхности</span></button>
+      <button class="g-tile wide tall duo land" type="button"><span data-l="До"><img decoding="async" src="img/d-washer-before.jpg" alt="Стиральная машина до чистки" loading="lazy"></span><span data-l="После"><img decoding="async" src="img/d-washer-after.jpg" alt="Стиральная машина после чистки" loading="lazy"></span><span class="cap">Стиральная машина</span></button>
+      <button class="g-tile wide tall duo" type="button"><span data-l="До"><img decoding="async" src="img/hood-before.jpg" alt="Жирные фильтры вытяжки и противень до мойки" loading="lazy"></span><span data-l="После"><img decoding="async" src="img/hood-after.jpg" alt="Чистые фильтры вытяжки и противень после мойки" loading="lazy"></span><span class="cap">Фильтры вытяжки и противень: до и после</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-cabinet.jpg" alt="Клинер протирает верх шкафа" loading="lazy"><span class="cap">Даже верх шкафов</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/g-cooktop.jpg" alt="Чистая варочная поверхность" loading="lazy"><span class="cap">Варочная поверхность</span></button>
+    </div>
+    <div class="vids" data-stagger>
+      <figure class="vid"><video controls playsinline preload="metadata" src="video/work-1.mp4#t=0.1" aria-label="Влажное обеспыливание стен"></video><figcaption>Стены: влажное обеспыливание</figcaption></figure>
+      <figure class="vid"><video controls playsinline preload="metadata" src="video/work-2.mp4#t=0.1" aria-label="Мойка окна парогенератором"></video><figcaption>Окна: паровая мойка</figcaption></figure>
+      <figure class="vid"><video controls playsinline preload="metadata" src="video/work-3.mp4#t=0.1" aria-label="Обработка мягкой мебели паром"></video><figcaption>Мягкая мебель: обработка паром</figcaption></figure>
+      <figure class="vid"><img decoding="async" src="img/warehouse.jpg" alt="Склад: мойка высокого окна с лесов" loading="lazy"><figcaption>Склад: уборка на высоте</figcaption></figure>
+      <figure class="vid"><video controls playsinline preload="metadata" src="video/work-5.mp4#t=0.1" aria-label="Подъёмник для работ на высоте"></video><figcaption>Подъёмник для работ на высоте</figcaption></figure>
+      <figure class="vid"><video controls playsinline preload="metadata" src="video/work-6.mp4#t=0.1" aria-label="Промышленный объект: леса и конструкции"></video><figcaption>Промышленный объект: леса и конструкции</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-ice" id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-home"/></svg></span>Наши услуги</p>
+      <h2 data-split>Уборка под любую <em>задачу</em></h2>
+      <p class="sec-sub" data-reveal>Цена за квадратный метр. Средства, инвентарь и только новые тряпки привозим с собой.</p>
+    </div>
+    <div class="svc-grid" data-stagger>
+      <article class="svc card lift tilt">
+        <span class="ic-circle"><svg class="ic"><use href="#i-broom"/></svg></span>
+        <h3>%%SVC_WET_TITLE%%</h3>
+        <p>%%SVC_WET_CARD%%</p>
+        <span class="price">от <b>%%PRICE_WET%%</b> ₸/м²</span>
+        <div class="svc-foot"><button class="link-btn" type="button" data-cl="wet">Что входит <svg class="ic"><use href="#i-list"/></svg></button><button class="link-btn" type="button" data-pick="wet">Рассчитать <svg class="ic"><use href="#i-arrow"/></svg></button></div>
+      </article>
+      <article class="svc card lift tilt">
+        <span class="ic-circle"><svg class="ic"><use href="#i-sparkle"/></svg></span>
+        <h3>%%SVC_GENERAL_TITLE%%</h3>
+        <p>%%SVC_GENERAL_CARD%%</p>
+        <span class="price">от <b>%%PRICE_GENERAL%%</b> ₸/м²</span>
+        <div class="svc-foot"><button class="link-btn" type="button" data-cl="general">Что входит <svg class="ic"><use href="#i-list"/></svg></button><button class="link-btn" type="button" data-pick="general">Рассчитать <svg class="ic"><use href="#i-arrow"/></svg></button></div>
+      </article>
+      <article class="svc card lift tilt">
+        <span class="ic-circle"><svg class="ic"><use href="#i-helmet"/></svg></span>
+        <h3>%%SVC_RENOVATION_TITLE%%</h3>
+        <p>%%SVC_RENOVATION_CARD%%</p>
+        <span class="price">от <b>%%PRICE_RENOVATION%%</b> ₸/м²</span>
+        <div class="svc-foot"><button class="link-btn" type="button" data-cl="renovation">Что входит <svg class="ic"><use href="#i-list"/></svg></button><button class="link-btn" type="button" data-pick="renovation">Рассчитать <svg class="ic"><use href="#i-arrow"/></svg></button></div>
+      </article>
+      <article class="svc card lift tilt">
+        <span class="ic-circle"><svg class="ic"><use href="#i-key"/></svg></span>
+        <h3>%%SVC_MOVEOUT_TITLE%%</h3>
+        <p>%%SVC_MOVEOUT_CARD%%</p>
+        <span class="price">от <b>%%PRICE_MOVEOUT%%</b> ₸/м²</span>
+        <div class="svc-foot"><button class="link-btn" type="button" data-cl="moveout">Что входит <svg class="ic"><use href="#i-list"/></svg></button><button class="link-btn" type="button" data-pick="moveout">Рассчитать <svg class="ic"><use href="#i-arrow"/></svg></button></div>
+      </article>
+    </div>
+
+
+
+    <div class="extras" data-reveal>
+      <div class="extras-head"><span class="eb-ic"><svg class="ic"><use href="#i-plus"/></svg></span><h3>Дополнительные услуги</h3></div>
+      <div class="extras-grid" data-stagger>
+        <div class="extra"><span class="ic-circle sm"><svg class="ic"><use href="#i-window"/></svg></span><div><h4>%%EXTRA1_TITLE%%</h4><p>%%EXTRA1_TEXT%%</p></div></div>
+        <div class="extra"><span class="ic-circle sm"><svg class="ic"><use href="#i-ceiling"/></svg></span><div><h4>%%EXTRA2_TITLE%%</h4><p>%%EXTRA2_TEXT%%</p></div></div>
+        <div class="extra"><span class="ic-circle sm"><svg class="ic"><use href="#i-curtain"/></svg></span><div><h4>%%EXTRA3_TITLE%%</h4><p>%%EXTRA3_TEXT%%</p></div></div>
+        <div class="extra"><span class="ic-circle sm"><svg class="ic"><use href="#i-ozone"/></svg></span><div><h4>%%EXTRA4_TITLE%%</h4><p>%%EXTRA4_TEXT%%</p></div></div>
+        <div class="extra"><span class="ic-circle sm"><svg class="ic"><use href="#i-sofa"/></svg></span><div><h4>%%EXTRA5_TITLE%%</h4><p>%%EXTRA5_TEXT%%</p><span class="price">от <b>%%CHEM_FMT%%</b> ₸</span></div></div>
+        <div class="extra"><span class="ic-circle sm"><svg class="ic"><use href="#i-cooktop"/></svg></span><div><h4>%%EXTRA6_TITLE%%</h4><p>%%EXTRA6_TEXT%%</p></div></div>
+      </div>
+      <div class="extra extra-wide"><span class="ic-circle sm"><svg class="ic"><use href="#i-building"/></svg></span><div><h4>%%FACADE_TITLE%%</h4><p>%%FACADE_TEXT%%</p></div><a class="btn btn-primary btn-sm magnet" href="https://wa.me/%%WA%%" data-wa="Здравствуйте! Интересует мойка фасада. Расскажите, пожалуйста, подробнее." target="_blank" rel="noopener"><svg class="ic"><use href="#i-wa"/></svg>Обсудить фасад</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="checklist">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-list"/></svg></span>Чек-лист</p>
+      <h2 data-split>Что входит в <em>уборку</em></h2>
+      <p class="sec-sub" data-reveal>Работаем по чек-листу — вы точно знаете, за что платите.</p>
+    </div>
+    <div class="cl-tabs" data-reveal>
+      <button type="button" class="on" aria-pressed="true" data-cl="general">Генеральная</button>
+      <button type="button" aria-pressed="false" data-cl="moveout">Перед заселением</button>
+      <button type="button" aria-pressed="false" data-cl="renovation">После ремонта</button>
+      <button type="button" aria-pressed="false" data-cl="wet">Влажная</button>
+    </div>
+
+    <div class="cl-panel" data-panel="general">
+      <p class="cl-scope"><svg class="ic"><use href="#i-home"/></svg>Во всех комнатах + 1 тёплый стандартный балкон</p>
+      <div class="cl-grid cl-feat">
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-home"/></svg></span>Комнаты</h3><ul>
+          <li>Моем окна изнутри, форточку — с двух сторон, москитную сетку</li>
+          <li>Парогенератором вычищаем грязь с уплотнителей окон<small>двойные, витражные и панорамные окна — доп. услуга</small></li>
+          <li>Моем подоконники, протираем гардины, откосы и карнизы</li>
+          <li>Моем радиаторы парогенератором</li>
+          <li>Моем люстры и бра, не снимая их<small>сложные люстры и бусы — до 2 шт. бесплатно</small></li>
+          <li>Влажно обеспыливаем стены от пыли и паутины</li>
+          <li>Чистим зеркала и стеклянные поверхности до блеска</li>
+          <li>Моем выключатели, двери и дверные ручки</li>
+          <li>Удаляем пыль со всех поверхностей</li>
+          <li>Пылесосим ковры, пол и мягкую мебель</li>
+          <li>Паровая обработка мягкой мебели паром 99 °C — свежесть и дезинфекция от мебельных клещей</li>
+          <li>Моем полы и плинтусы</li>
+          <li>Моем и протираем все шкафы снаружи</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-cooktop"/></svg></span>Кухня</h3><ul>
+          <li>Моем духовку, вытяжку, микроволновку и варочную поверхность — удаляем жир</li>
+          <li>Передвигаем холодильник и моем его внутри и снаружи</li>
+          <li>Моем кухонный гарнитур внутри и снаружи</li>
+          <li>Чистим раковину от мыльных разводов, известкового налёта и ржавчины</li>
+          <li>Чистим межкафельные швы от жира и грязи</li>
+          <li>Чистим фартук и столешницу от жировых загрязнений</li>
+          <li>Протираем обеденный стол и стулья</li>
+          <li>Моем мусорное ведро и меняем пакет</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-bath"/></svg></span>Санузел</h3><ul>
+          <li>Моем кафель от потолка до пола и межкафельные швы<small>швы мозаики — доп. услуга</small></li>
+          <li>Отмываем ванну, душевую кабину и раковину от разводов, налёта и плесени</li>
+          <li>Чистим и дезинфицируем унитаз и всю сантехнику</li>
+          <li>Чистим сантехническую мебель внутри и снаружи</li>
+          <li>Передвигаем стиральную машину, протираем внутри и снаружи, моем отсек для порошка</li>
+          <li>Очищаем зеркала и стеклянные поверхности</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-door"/></svg></span>Коридор</h3><ul>
+          <li>Протираем фасады шкафов снаружи и открытые полки</li>
+          <li>Моем люстры и бра, не снимая их</li>
+          <li>Чистим зеркала и стеклянные поверхности до блеска</li>
+          <li>Протираем обувницу внутри и снаружи</li>
+          <li>Протираем выключатели, розетки и электрощиток внутри и снаружи</li>
+          <li>Моем входную дверь с обеих сторон, протираем ручки</li>
+          <li>Выносим мусор после уборки</li>
+        </ul></div>
+      </div>
+    </div>
+
+    <div class="cl-panel" data-panel="moveout" hidden>
+      <p class="cl-scope"><svg class="ic"><use href="#i-key"/></svg>Генеральная перед заселением после прежних жильцов · все комнаты + 1 тёплый стандартный балкон</p>
+      <div class="cl-grid cl-feat">
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-home"/></svg></span>Комнаты</h3><ul>
+          <li>Моем окна изнутри, форточку — с двух сторон парогенератором<small>панорамные, витражные и двойные окна — доп. услуга</small></li>
+          <li>Моем подоконники, протираем гардины, откосы и карнизы</li>
+          <li>Моем радиаторы парогенератором</li>
+          <li>Моем люстры и бра, не снимая их<small>сложные люстры и бусы — до 2 шт. бесплатно</small></li>
+          <li>Влажная уборка стен от пыли и паутины</li>
+          <li>Чистим зеркала и стеклянные поверхности до блеска</li>
+          <li>Моем выключатели, розетки, двери и дверные ручки</li>
+          <li>Удаляем пыль со всех поверхностей</li>
+          <li>Пылесосим ковры, пол и мягкую мебель</li>
+          <li>Паровая обработка мягкой мебели паром 99 °C — свежесть и дезинфекция</li>
+          <li>Моем полы и плинтусы</li>
+          <li><b>Моем все шкафы внутри и снаружи</b></li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-cooktop"/></svg></span>Кухня</h3><ul>
+          <li>Моем духовку, вытяжку, микроволновку и варочную поверхность — удаляем жир</li>
+          <li>Передвигаем холодильник и моем его внутри и снаружи</li>
+          <li>Моем кухонный гарнитур внутри и снаружи</li>
+          <li>Чистим раковину от мыльных разводов, известкового налёта и ржавчины</li>
+          <li>Чистим фартук и межкафельные швы, моем столешницу</li>
+          <li>Протираем обеденный стол и стулья</li>
+          <li>Моем окно и батареи, люстру и светильники</li>
+          <li>Обеспыливаем кухонную мягкую мебель и обрабатываем паром</li>
+          <li>Протираем розетки и выключатели</li>
+          <li>Моем мусорное ведро и меняем пакет</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-bath"/></svg></span>Санузел</h3><ul>
+          <li>Моем кафель от потолка до пола, очищаем его парогенератором</li>
+          <li>Отмываем ванну, душевую кабину и раковину от разводов, налёта и плесени</li>
+          <li>Чистим и дезинфицируем унитаз и всю сантехнику</li>
+          <li>Чистим сантехническую мебель внутри и снаружи</li>
+          <li>Передвигаем стиральную машину, протираем внутри и снаружи, чистим отсек для порошка</li>
+          <li>Очищаем зеркала и стеклянные поверхности</li>
+          <li>Протираем розетки, выключатели и светильники</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-door"/></svg></span>Коридор</h3><ul>
+          <li><b>Протираем все шкафы снаружи и внутри</b></li>
+          <li>Моем люстры и бра, не снимая их</li>
+          <li>Чистим зеркала и стеклянные поверхности до блеска</li>
+          <li>Протираем обувницу внутри и снаружи</li>
+          <li>Моем выключатели, протираем электрощиток внутри и снаружи</li>
+          <li>Моем входную дверь с обеих сторон, протираем ручки</li>
+          <li>Выносим мусор после уборки</li>
+        </ul></div>
+      </div>
+    </div>
+
+    <div class="cl-panel" data-panel="renovation" hidden>
+      <p class="cl-scope"><svg class="ic"><use href="#i-helmet"/></svg>Генеральная после ремонта · все комнаты + 1 стандартный балкон</p>
+      <div class="cl-grid cl-even">
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-helmet"/></svg></span>Стройгрязь</h3><ul>
+          <li>Удаляем строительные загрязнения — следы клея, эмульсии, цемента и др.</li>
+          <li>Удаляем строительную пыль</li>
+          <li>Влажно обеспыливаем натяжные потолки и стены</li>
+          <li>Моем пол и плинтусы средством с эффектом антистатика</li>
+          <li>Собираем и выносим до 5 кг строительного и бытового мусора</li>
+          <li>Вычищаем входную дверь от строительной грязи с двух сторон</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-window"/></svg></span>Окна и мебель</h3><ul>
+          <li>Моем окна изнутри парогенератором, очищаем рамы, снимаем свежие плёнки<small>сложные засохшие плёнки, панорамные, витражные и двойные окна — доп. услуга</small></li>
+          <li>Моем подоконники, батареи, гардины, откосы и карнизы</li>
+          <li>Моем всю корпусную мебель внутри и снаружи от опилок и пыли<small>многочисленные бумажные наклейки — доп. услуга</small></li>
+          <li>Моем двери и дверные ручки</li>
+          <li>Очищаем выключатели и розетки от строительной пыли</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-ceiling"/></svg></span>Свет и детали</h3><ul>
+          <li>Удаляем пыль с осветительных приборов</li>
+          <li>Моем люстры и бра, не снимая их<small>со сложными элементами — до 2 шт.</small></li>
+          <li>Очищаем треки, софиты, скрытые и теневые плинтусы<small>сложные, труднодоступные, в эмульсии или засохшем клее — доп. услуга</small></li>
+          <li>Очищаем зеркала, стеклянные поверхности и декор</li>
+          <li>Протираем электрощитки</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-bath"/></svg></span>Кухня и санузел</h3><ul>
+          <li>Очищаем раковину и краны до блеска</li>
+          <li>Отмываем всю технику снаружи</li>
+          <li>Отмываем фартук от затирки швов</li>
+          <li>Чистим кафель от строительных загрязнений</li>
+          <li>Отмываем всю сантехнику до блеска и дезинфицируем</li>
+        </ul></div>
+      </div>
+      <div class="cl-box cl-box-wide"><h4><svg class="ic"><use href="#i-fridge"/></svg>Мойка б/у бытовой техники</h4><ul class="tags"><li>Холодильник — <b>%%PRICE_FRIDGE%% ₸</b></li><li>Вытяжка — <b>%%PRICE_HOOD%% ₸</b></li><li>Духовой шкаф с плитой — <b>%%PRICE_OVEN%% ₸</b></li><li>Микроволновка — <b>%%PRICE_MICRO%% ₸</b></li></ul></div>
+    </div>
+
+    <div class="cl-panel" data-panel="wet" hidden>
+      <p class="cl-scope"><svg class="ic"><use href="#i-broom"/></svg>Влажная поддерживающая уборка · во всех комнатах</p>
+      <div class="cl-grid">
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-home"/></svg></span>Комнаты</h3><ul>
+          <li>Протираем от пыли все доступные поверхности — на уровне вытянутой руки</li>
+          <li>Очищаем зеркала и стеклянные поверхности</li>
+          <li>Протираем шкафы снаружи и подоконники</li>
+          <li>Протираем выключатели и дверные ручки</li>
+          <li>Пылесосим ковры и коврики</li>
+          <li>Моем пол и плинтусы</li>
+          <li>Выносим небольшое количество бытового мусора</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-cooktop"/></svg></span>Кухня</h3><ul>
+          <li>Очищаем раковину и краны</li>
+          <li>Протираем столешницу и кухонный фартук</li>
+          <li>Моем варочную поверхность, чистим газовую плиту</li>
+          <li>Протираем обеденный стол и стулья</li>
+          <li>Протираем снаружи технику и фасады гарнитура</li>
+          <li>Моем посуду — небольшое количество в раковине</li>
+          <li>Моем мусорное ведро и меняем пакет</li>
+        </ul></div>
+        <div class="cl-card card"><h3><span class="ic-circle sm"><svg class="ic"><use href="#i-bath"/></svg></span>Санузел</h3><ul>
+          <li>Протираем ванну, душевую кабину и раковину, очищаем краны</li>
+          <li>Моем и дезинфицируем унитаз</li>
+          <li>Протираем фасады мебели, полочки и двери</li>
+          <li>Протираем стиральную машину</li>
+          <li>Очищаем зеркала и стеклянные поверхности</li>
+          <li>Протираем от пыли все доступные поверхности</li>
+        </ul></div>
+      </div>
+    </div>
+
+    <div class="cl-foot">
+      <div class="cl-box"><h4><svg class="ic"><use href="#i-vacuum"/></svg>Привозим с собой</h4><ul class="tags"><li>Парогенератор</li><li>Пылесос</li><li>Стремянку</li><li>Средства для уборки</li><li>Инвентарь</li><li>Только новые тряпки</li></ul></div>
+      <div class="cl-box"><h4><svg class="ic"><use href="#i-plus"/></svg>Можно добавить</h4><ul class="tags"><li>Мойка окон снаружи на любой высоте</li><li>Мойка фасадов любой сложности</li><li>Работаем с промышленными альпинистами</li><li>Натяжные потолки</li><li>Стирка штор и тюля</li><li>Озонирование</li><li>Химчистка мебели и ковров — <b>от %%CHEM_FMT%% ₸</b></li><li>Полировка варочной поверхности</li></ul></div>
+    </div>
+    <p class="cl-note"><svg class="ic"><use href="#i-info"/></svg><span><b>Уважаемые клиенты!</b> Все финансовые и рабочие вопросы — через менеджера. Просим не обсуждать общую сумму с клинерами; контакты клинеров не передаются. Благодарим за понимание.</span></p>
+  </div>
+</section>
+
+<section class="ba" id="before-after">
+  <div class="ba-pin">
+    <div class="wrap ba-in">
+      <div class="sec-head center">
+        <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-sparkle"/></svg></span>До и после</p>
+        <h2 data-split>Прокрутите — и станет <em>чисто</em></h2>
+      </div>
+      <div class="ba-tabs">
+        <button type="button" class="on" aria-pressed="true" data-ba="real">Наш объект</button>
+        <button type="button" aria-pressed="false" data-ba="hood">Вытяжка</button>
+        <button type="button" aria-pressed="false" data-ba="living">Гостиная</button>
+        <button type="button" aria-pressed="false" data-ba="kitchen">Кухня</button>
+        <button type="button" aria-pressed="false" data-ba="bath">Ванная</button>
+      </div>
+      <div class="ba-stage" id="ba">
+        <div class="ba-before"><img decoding="async" src="img/ba-real-before.jpg" alt="Полка под раковиной до уборки" loading="lazy"></div>
+        <div class="ba-after"><img decoding="async" src="img/ba-real-after.jpg" alt="Полка под раковиной после уборки" loading="lazy"></div>
+        <div class="ba-line"><span class="ba-handle"><svg class="ic"><use href="#i-squeegee"/></svg></span></div>
+        <span class="ba-tag t-after">После</span><span class="ba-tag t-before">До</span>
+        <div class="ba-meter"><span>Чистота</span><b id="ba-pct">56%</b></div>
+      </div>
+      <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Сравнить до и после">
+      <p class="ba-note" id="ba-note">Реальная работа Quality Клининг: полка под раковиной до и после уборки.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-ice" id="dryclean">
+  <div class="wrap">
+    <div class="chem-head">
+      <div class="sec-head">
+        <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-sofa"/></svg></span>Химчистка</p>
+        <h2 data-split>Химчистка мебели и <em>ковров</em></h2>
+        <p class="sec-sub" data-reveal>Сухая и аква-чистка всех видов мягкой мебели, ковров и ковровых покрытий профессиональным моющим пылесосом. Паровая обработка 99 °C — для свежести и дезинфекции.</p>
+      </div>
+      <div class="chem-cta" data-reveal>
+        <span class="price">от <b>%%CHEM_FMT%%</b> ₸</span>
+        <button class="btn btn-primary magnet" type="button" data-chem><svg class="ic"><use href="#i-calc"/></svg>Рассчитать химчистку</button>
+      </div>
+    </div>
+    <div class="gallery chem-gallery" data-stagger>
+      <button class="g-tile wide tall duo" type="button"><span data-l="До"><img decoding="async" src="img/chem-sofa-before.jpg" alt="Угловой диван с пятнами до химчистки" loading="lazy"></span><span data-l="После"><img decoding="async" src="img/chem-sofa-after.jpg" alt="Угловой диван после химчистки" loading="lazy"></span><span class="cap">Угловой диван: до и после</span></button>
+      <button class="g-tile wide tall" type="button"><img decoding="async" src="img/chem-chairs.jpg" alt="Два кресла: слева до химчистки, справа после" loading="lazy"><span class="cap">Кресла: слева — до, справа — после</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/oven-clean.jpg" alt="Клинер в перчатках отмывает духовку" loading="lazy"><span class="cap">Духовка: отмываем жир внутри и снаружи</span></button>
+      <button class="g-tile tall" type="button"><img decoding="async" src="img/oven-inside.jpg" alt="Чистка внутренней поверхности духовки" loading="lazy"><span class="cap">Духовка внутри — до блеска</span></button>
+      <button class="g-tile" type="button"><img decoding="async" src="img/steam.jpg" alt="Обработка поверхности парогенератором" loading="lazy"><span class="cap">Парогенератор вместо резкой химии</span></button>
+      <button class="g-tile" type="button"><img decoding="async" src="img/radiator.jpg" alt="Чистый радиатор после обработки паром" loading="lazy"><span class="cap">Радиаторы — парогенератором</span></button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="calc">
+  <div class="wrap calc-grid">
+    <div class="calc-copy">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-calc"/></svg></span>Калькулятор</p>
+      <h2 data-split>Узнайте цену за <em>10 секунд</em></h2>
+      <p class="sec-sub" data-reveal>Выберите тип уборки и площадь, отправьте расчёт в WhatsApp — менеджер подтвердит время и точную сумму.</p>
+      <ul class="ticks" data-stagger>
+        <li><svg class="ic"><use href="#i-check"/></svg>Средства, инвентарь и новые тряпки — включены</li>
+        <li><svg class="ic"><use href="#i-check"/></svg>Заявки принимаем круглосуточно</li>
+        <li><svg class="ic"><use href="#i-check"/></svg>Оплата картой, наличными или переводом</li>
+      </ul>
+    </div>
+    <form class="calc card" id="calc-form" data-reveal>
+      <fieldset>
+        <legend>Тип уборки</legend>
+        <div class="seg-opts">
+          <label class="opt"><input type="radio" name="kind" value="wet" checked><span>%%CALC_WET%%<small>от %%PRICE_WET%% ₸/м²</small></span></label>
+          <label class="opt"><input type="radio" name="kind" value="general"><span>%%CALC_GENERAL%%<small>от %%PRICE_GENERAL%% ₸/м²</small></span></label>
+          <label class="opt"><input type="radio" name="kind" value="renovation"><span>%%CALC_RENOVATION%%<small>от %%PRICE_RENOVATION%% ₸/м²</small></span></label>
+          <label class="opt"><input type="radio" name="kind" value="moveout"><span>%%CALC_MOVEOUT%%<small>от %%PRICE_MOVEOUT%% ₸/м²</small></span></label>
+        </div>
+      </fieldset>
+      <div class="area">
+        <div class="area-row"><label for="area">Площадь</label><span class="area-val"><input id="area-num" type="number" min="10" max="1000" value="60" inputmode="numeric" aria-label="Площадь в квадратных метрах"> м²</span></div>
+        <input id="area" type="range" min="20" max="300" step="5" value="60" aria-label="Площадь, ползунок">
+      </div>
+      <fieldset>
+        <legend>Дополнительно</legend>
+        <div class="chips-opts">
+          <label class="chip-opt"><input type="checkbox" name="extra" value="%%CHEM_VALUE%%" data-extra="chem" data-price="%%CHEM_RAW%%"><span>%%CHEM_SHORT%% <small>от %%CHEM_FMT%% ₸</small></span></label>
+          <label class="chip-opt"><input type="checkbox" name="extra" value="Мытьё окон снаружи"><span>Окна снаружи</span></label>
+          <label class="chip-opt"><input type="checkbox" name="extra" value="Мытьё натяжных потолков"><span>Натяжные потолки</span></label>
+          <label class="chip-opt"><input type="checkbox" name="extra" value="Стирка штор и тюля"><span>Шторы и тюль</span></label>
+          <label class="chip-opt"><input type="checkbox" name="extra" value="Озонирование"><span>Озонирование</span></label>
+          <label class="chip-opt"><input type="checkbox" name="extra" value="Полировка варочной поверхности"><span>Полировка варочной</span></label>
+        </div>
+      </fieldset>
+      <div class="total" aria-live="polite">
+        <span>Предварительно</span>
+        <output id="total">от %%CALC_INITIAL%% ₸</output>
+        <small>Услуги без цены (окна снаружи, потолки, шторы, озонирование, полировка) менеджер посчитает отдельно</small>
+      </div>
+      <button class="btn btn-primary btn-lg btn-block magnet" type="submit"><svg class="ic"><use href="#i-wa"/></svg>Отправить расчёт в WhatsApp</button>
+    </form>
+  </div>
+</section>
+
+<section class="section bg-ice" id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-shield"/></svg></span>Почему мы</p>
+      <h2 data-split>Чистота в каждом <em>уголке</em></h2>
+    </div>
+    <div class="stats" data-stagger>
+      <div class="stat"><b data-count="%%RATING%%">%%RATING%%</b><span>рейтинг в 2ГИС</span></div>
+      <div class="stat"><b data-count="%%STAT_COUNT%%">%%STAT_COUNT%%</b><span>оценок клиентов</span></div>
+      <div class="stat"><b><span data-count="%%YEARS%%">%%YEARS%%</span> лет</b><span>%%YEARS_LABEL%%</span></div>
+      <div class="stat"><b>24/7</b><span>приём заявок</span></div>
+    </div>
+    <div class="feat-grid" data-stagger>
+      <div class="feat card lift tilt"><span class="ic-circle sm"><svg class="ic"><use href="#i-vacuum"/></svg></span><div><h3>Всё привозим с собой</h3><p>Парогенератор, мощный пылесос, стремянку, профессиональные средства, инвентарь и новые тряпки. С вас — только вода и электричество.</p></div></div>
+      <div class="feat card lift tilt"><span class="ic-circle sm"><svg class="ic"><use href="#i-usercheck"/></svg></span><div><h3>Проверка качества</h3><p>Администратор проверяет результат, прежде чем вы примете работу.</p></div></div>
+      <div class="feat card lift tilt"><span class="ic-circle sm"><svg class="ic"><use href="#i-clock"/></svg></span><div><h3>Приезжаем вовремя</h3><p>Ко времени, которое вы выбрали, со всем необходимым.</p></div></div>
+      <div class="feat card lift tilt"><span class="ic-circle sm"><svg class="ic"><use href="#i-leaf"/></svg></span><div><h3>Пар вместо резкой химии</h3><p>Мягкую мебель обрабатываем паром 99 °C — свежо и без запаха химии.</p></div></div>
+      <div class="feat card lift tilt"><span class="ic-circle sm"><svg class="ic"><use href="#i-sparkle"/></svg></span><div><h3>До каждой детали</h3><p>Люстры и бра, радиаторы парогенератором, межкафельные швы, розетки и выключатели.</p></div></div>
+      <div class="feat card lift tilt"><span class="ic-circle sm"><svg class="ic"><use href="#i-card"/></svg></span><div><h3>Удобная оплата</h3><p>Картой, наличными или переводом с карты.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-check"/></svg></span>Как мы работаем</p>
+      <h2 data-split>Четыре шага до <em>чистоты</em></h2>
+    </div>
+    <div class="steps-wrap">
+      <span class="steps-line" aria-hidden="true"></span>
+      <ol class="steps">
+        <li><span class="num">1</span><h3>Заявка</h3><p>WhatsApp, звонок или расчёт с сайта — круглосуточно.</p></li>
+        <li><span class="num">2</span><h3>Расчёт и время</h3><p>Уточним площадь и задачи, назовём цену и удобное время.</p></li>
+        <li><span class="num">3</span><h3>Уборка по чек-листу</h3><p>Команда приезжает с парогенератором, пылесосом, стремянкой и средствами.</p></li>
+        <li><span class="num">4</span><h3>Проверка</h3><p>Администратор проверяет результат. Вопросы по оплате — через менеджера.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reviews">
+  <div class="wrap">
+    <div class="rating-row">
+      <div class="sec-head">
+        <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-heart"/></svg></span>Отзывы</p>
+        <h2 data-split>%%REVIEWS_HEAD%% <em>%%RATING%%</em></h2>
+      </div>
+      <a class="rating-big card" href="%%GIS_REVIEWS%%" target="_blank" rel="noopener" data-reveal>
+        <b>4.9</b>
+        <span><span class="stars"><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg><svg class="ic"><use href="#i-star"/></svg></span>%%REVIEWS_LINK%%</span>
+      </a>
+    </div>
+  </div>
+  <div class="marquee">
+    <div class="mq-track" style="--n:%%REVIEWS_N1%%">
+%%REVIEWS_1%%
+    </div>
+  </div>
+  <div class="marquee rev">
+    <div class="mq-track" style="--n:%%REVIEWS_N2%%">
+%%REVIEWS_2%%
+    </div>
+  </div>
+</section>
+
+<section class="section bg-ice faq" id="faq">
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="eyebrow" data-reveal><span class="eb-ic"><svg class="ic"><use href="#i-plus"/></svg></span>Вопросы</p>
+      <h2 data-split>Частые <em>вопросы</em></h2>
+    </div>
+    <div class="faq-list" data-stagger>
+%%FAQ_HTML%%
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="contacts">
+  <svg class="wave wave-top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C240 120 480 8 720 40s480 88 720 16v64H0Z"/></svg>
+  <span class="spark c1">✦</span><span class="spark c2">✦</span><span class="spark c3">✦</span>
+  <div class="wrap cta-in">
+    <div>
+      <p class="script light" data-reveal>%%CTA_SCRIPT%% <svg class="ic heart"><use href="#i-heart"/></svg></p>
+      <h2 data-split>%%CTA_H2%% <em>%%CTA_H2_EM%%</em></h2>
+      <div class="cta-btns" data-reveal>
+        <a class="btn btn-white btn-lg magnet" href="https://wa.me/%%WA%%" data-wa target="_blank" rel="noopener"><svg class="ic wa-ic"><use href="#i-wa"/></svg>Написать в WhatsApp</a>
+        <a class="btn btn-outline-light btn-lg magnet" href="tel:%%PHONE1%%"><svg class="ic"><use href="#i-phone"/></svg>Позвонить</a>
+        <a class="btn btn-outline-light btn-lg magnet" href="https://wa.me/%%WA%%" data-wa="Здравствуйте! Интересует обучение по направлению клининга. Расскажите, пожалуйста, подробнее." target="_blank" rel="noopener"><svg class="ic"><use href="#i-learn"/></svg>Обучение по направлению клининга</a>
+      </div>
+      <div class="badges" data-stagger>
+        <span><svg class="ic"><use href="#i-shield"/></svg>Гарантия качества</span>
+        <span><svg class="ic"><use href="#i-sparkle"/></svg>Чистота в каждом уголке</span>
+        <span><svg class="ic"><use href="#i-heart"/></svg>Доверие клиентов</span>
+      </div>
+    </div>
+    <div class="contact-card" data-reveal>
+      <a class="phone-big" href="tel:%%PHONE1%%"><svg class="ic"><use href="#i-phone"/></svg>%%PHONE1_DISPLAY%%</a>
+      <a class="phone-big" href="tel:%%PHONE2%%"><svg class="ic"><use href="#i-phone"/></svg>%%PHONE2_DISPLAY%%</a>
+      <ul class="contact-list">
+        <li><svg class="ic"><use href="#i-pin"/></svg><span>%%ADDRESS_LINE%% · <a href="%%GIS%%" target="_blank" rel="noopener">маршрут в 2ГИС</a></span></li>
+        <li><svg class="ic"><use href="#i-clock"/></svg><span>%%HOURS%%</span></li>
+        <li><svg class="ic"><use href="#i-mail"/></svg><a href="mailto:%%EMAIL%%">%%EMAIL%%</a></li>
+        <li><svg class="ic"><use href="#i-ig"/></svg><a href="%%INSTAGRAM_URL%%" target="_blank" rel="noopener">%%INSTAGRAM_HANDLE%%</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <a class="logo-badge" href="#top" aria-label="Наверх"><img decoding="async" src="img/logo.png" alt="%%BRAND%%" width="288" height="268" loading="lazy"></a>
+    <span>%%FOOTER_LINE%%</span>
+    <span>%%FOOTER_TAGLINE%%</span>
+  </div>
+</footer>
+
+<dialog class="lightbox" id="lightbox" aria-label="Фото">
+  <button class="lb-close" type="button" aria-label="Закрыть">×</button>
+  <div class="lb-body"></div>
+  <p class="lb-cap"></p>
+</dialog>
+
+<a class="fab" href="https://wa.me/%%WA%%" data-wa target="_blank" rel="noopener" aria-label="Написать в WhatsApp"><svg class="ic"><use href="#i-wa"/></svg></a>
+
+</body>
+</html>

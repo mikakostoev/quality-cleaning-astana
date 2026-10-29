@@ -283,6 +283,7 @@ setTimeout(function(){d.classList.remove('anim')},6000)})();
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+<script type="application/json" id="site-config">{"whatsapp":"77779527961","prices":{"wet":400,"general":800,"renovation":850,"moveout":850},"names":{"wet":"Влажная уборка","general":"Генеральная уборка","renovation":"Уборка после ремонта","moveout":"Уборка после прежних жильцов"},"extras":{"chem":2000},"chemLabel":"Химчистка"}</script>
 <script src="app.js" defer></script>
 </head>
 <body>
@@ -784,7 +785,7 @@ setTimeout(function(){d.classList.remove('anim')},6000)})();
       <fieldset>
         <legend>Дополнительно</legend>
         <div class="chips-opts">
-          <label class="chip-opt"><input type="checkbox" name="extra" value="Химчистка мебели и ковров" data-price="2000"><span>Химчистка <small>от 2 000 ₸</small></span></label>
+          <label class="chip-opt"><input type="checkbox" name="extra" value="Химчистка мебели и ковров" data-extra="chem" data-price="2000"><span>Химчистка <small>от 2 000 ₸</small></span></label>
           <label class="chip-opt"><input type="checkbox" name="extra" value="Мытьё окон снаружи"><span>Окна снаружи</span></label>
           <label class="chip-opt"><input type="checkbox" name="extra" value="Мытьё натяжных потолков"><span>Натяжные потолки</span></label>
           <label class="chip-opt"><input type="checkbox" name="extra" value="Стирка штор и тюля"><span>Шторы и тюль</span></label>

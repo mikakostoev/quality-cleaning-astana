@@ -20,10 +20,23 @@
 <main>
   <section class="card gate" id="gate">
     <form id="login" method="post" action="/admin">
-      <label>Пароль
-        <input name="password" type="password" autocomplete="current-password" required>
-      </label>
-      <button class="primary" type="submit">Войти</button>
+      <div id="credentials">
+        <label>Логин
+          <input id="login-name" name="login" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        </label>
+        <label>Пароль
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </label>
+      </div>
+      <div id="otp-step" hidden>
+        <p class="hint" id="otp-hint"></p>
+        <label>Код из письма
+          <input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required disabled>
+        </label>
+        <button class="ghost" type="button" id="resend">Отправить код ещё раз</button>
+        <button class="ghost" type="button" id="back-login">Другой логин</button>
+      </div>
+      <button class="primary" type="submit" id="login-submit">Продолжить</button>
       <p class="msg" id="login-msg" role="alert"></p>
     </form>
     <p class="msg" id="setup" hidden></p>

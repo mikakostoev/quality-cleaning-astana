@@ -4,8 +4,9 @@ import { ContentError, normalizeContent } from '../lib/content.mjs';
 import { buildFaqPage, buildLocalBusiness } from '../lib/jsonld.mjs';
 import { priceAnswer } from '../lib/prices.mjs';
 import { renderSite, siteConfig } from '../lib/render.mjs';
-import { checkPassword, isConfigured, resetRateLimit, verifySession } from '../lib/auth.mjs';
+import { checkLogin, checkPassword, isConfigured, resetRateLimit, verifySession } from '../lib/auth.mjs';
 import { getContent, login, putContent } from '../lib/admin-api.mjs';
+import { sendLoginCode } from '../lib/resend.mjs';
 import { createGithub } from '../lib/github.mjs';
 import { bumpSitemap, publishContent } from '../lib/publish.mjs';
 import { assertWorksComplete, normalizeUploads, workFileChanges } from '../lib/works.mjs';
@@ -108,6 +109,11 @@ check('admin is noindex and absent from the sitemap', () => {
   const robots = fs.readFileSync('robots.txt', 'utf8');
   const sitemap = fs.readFileSync('sitemap.xml', 'utf8');
   assert.match(admin, /noindex/);
+  assert.match(admin, /id="login-name"/);
+  assert.match(admin, /autocomplete="one-time-code"/);
+  const adminJs = fs.readFileSync('admin/admin.js', 'utf8');
+  assert.match(adminJs, /step === 'otp'/);
+  assert.match(adminJs, /resend: true/);
   assert.match(robots, /Disallow: \/admin/);
   assert.match(robots, /Disallow: \/api/);
   assert.equal(sitemap.includes('/admin'), false);
@@ -123,67 +129,284 @@ check('sitemap lastmod bump keeps a single homepage url', () => {
 });
 
 const host = { origin: 'http://127.0.0.1:4173', host: '127.0.0.1:4173', 'x-admin': '1' };
+const AUTH_KEYS = ['ADMIN_PASSWORD', 'ADMIN_LOGIN', 'ADMIN_EMAIL', 'RESEND_API_KEY', 'RESEND_FROM', 'CMS_LOCAL_PUBLISH', 'VERCEL'];
 
-await checkAsync('password missing fails closed', async () => {
-  const previous = process.env.ADMIN_PASSWORD;
-  delete process.env.ADMIN_PASSWORD;
-  resetRateLimit();
-  const entered = await login({ method: 'POST', headers: host, body: { password: 'whatever-password' }, ip: '203.0.113.5', secure: false, now: 1 });
-  const loaded = await getContent({ method: 'GET', headers: host, ip: '203.0.113.5', secure: false, now: 1 });
-  assert.equal(entered.status, 503);
-  assert.equal(loaded.status, 503);
-  assert.equal(isConfigured(), false);
-  process.env.ADMIN_PASSWORD = 'short';
-  assert.equal(isConfigured(), false);
-  process.env.ADMIN_PASSWORD = previous;
+function captureEnv(keys) {
+  const saved = {};
+  for (const key of keys) saved[key] = process.env[key];
+  return () => {
+    for (const [key, value] of Object.entries(saved)) {
+      if (value == null) delete process.env[key];
+      else process.env[key] = value;
+    }
+  };
+}
+
+function useAuthEnv() {
+  process.env.ADMIN_LOGIN = 'admin';
+  process.env.ADMIN_PASSWORD = 'correct-horse-battery';
+  process.env.ADMIN_EMAIL = 'owner@example.com';
+  process.env.RESEND_API_KEY = 're_test_key_123456';
+  process.env.RESEND_FROM = 'Quality Клининг <login@example.com>';
+  delete process.env.CMS_LOCAL_PUBLISH;
+  delete process.env.VERCEL;
+}
+
+function cookieValue(setCookie, name) {
+  const list = Array.isArray(setCookie) ? setCookie : [setCookie || ''];
+  const row = list.find((item) => String(item).startsWith(`${name}=`));
+  if (!row) return '';
+  return decodeURIComponent(row.split(';')[0].slice(name.length + 1));
+}
+
+async function sessionHeader(ip, now) {
+  const sent = [];
+  const started = await login({
+    method: 'POST',
+    headers: host,
+    body: { login: 'admin', password: 'correct-horse-battery' },
+    ip,
+    secure: false,
+    now,
+  }, { sendMail: async ({ code }) => { sent.push(code); } });
+  assert.equal(started.status, 200);
+  const otp = cookieValue(started.headers['Set-Cookie'], 'qc_otp');
+  const done = await login({
+    method: 'POST',
+    headers: { ...host, cookie: `qc_otp=${encodeURIComponent(otp)}` },
+    body: { code: sent.at(-1) },
+    ip,
+    secure: false,
+    now,
+  });
+  assert.equal(done.status, 200);
+  return `qc_admin=${encodeURIComponent(cookieValue(done.headers['Set-Cookie'], 'qc_admin'))}`;
+}
+
+await checkAsync('auth missing fails closed', async () => {
+  const undo = captureEnv(AUTH_KEYS);
+  try {
+    for (const key of AUTH_KEYS) delete process.env[key];
+    resetRateLimit();
+    const entered = await login({ method: 'POST', headers: host, body: { login: 'admin', password: 'whatever-password' }, ip: '203.0.113.5', secure: false, now: 1 });
+    const loaded = await getContent({ method: 'GET', headers: host, ip: '203.0.113.5', secure: false, now: 1 });
+    assert.equal(entered.status, 503);
+    assert.match(entered.body.error, /RESEND_API_KEY/);
+    assert.equal(loaded.status, 503);
+    assert.equal(isConfigured(), false);
+    process.env.ADMIN_PASSWORD = 'short';
+    process.env.ADMIN_LOGIN = 'ad';
+    process.env.ADMIN_EMAIL = 'not-an-email';
+    process.env.RESEND_API_KEY = 'short';
+    process.env.RESEND_FROM = 'missing-at';
+    assert.equal(isConfigured(), false);
+    process.env.VERCEL = '1';
+    process.env.CMS_LOCAL_PUBLISH = '1';
+    process.env.ADMIN_PASSWORD = 'correct-horse-battery';
+    process.env.ADMIN_LOGIN = 'admin';
+    process.env.ADMIN_EMAIL = 'owner@example.com';
+    delete process.env.RESEND_API_KEY;
+    delete process.env.RESEND_FROM;
+    assert.equal(isConfigured(), false);
+  } finally {
+    undo();
+  }
 });
 
-await checkAsync('login, wrong password, and a price save', async () => {
-  process.env.ADMIN_PASSWORD = 'correct-horse-battery';
-  resetRateLimit();
-  const now = Date.now();
-  const bad = await login({ method: 'POST', headers: host, body: { password: 'not-the-password' }, ip: '203.0.113.8', secure: false, now });
-  assert.equal(bad.status, 401);
-  assert.equal(checkPassword('correct-horse-battery'), true);
-  const good = await login({ method: 'POST', headers: host, body: { password: 'correct-horse-battery' }, ip: '203.0.113.8', secure: false, now });
-  assert.equal(good.status, 200);
-  const cookie = good.headers['Set-Cookie'].split(';')[0];
-  assert.equal(verifySession(decodeURIComponent(cookie.split('=')[1]), now), true);
-  const denied = await getContent({ method: 'GET', headers: { ...host, cookie: '' }, ip: '203.0.113.8', secure: false, now });
-  assert.equal(denied.status, 401);
-  const next = structuredClone(content);
-  next.prices.wet = 450;
-  let published = null;
-  const saved = await putContent({
-    method: 'PUT',
-    headers: { ...host, cookie },
-    body: { content: next },
-    ip: '203.0.113.8',
-    secure: false,
-    now,
-  }, {
-    async publish(value) {
-      published = renderSite(value);
-      return { message: 'Сохранено в тесте' };
-    },
-  });
-  assert.equal(saved.status, 200);
-  assert.match(published, /от <b>450<\/b> ₸\/м²/);
-  const config = JSON.parse(published.match(/id="site-config">([\s\S]*?)<\/script>/)[1]);
-  assert.equal(config.prices.wet, 450);
-  const ld = JSON.parse(published.match(/<script type="application\/ld\+json">\n([\s\S]*?)\n<\/script>/)[1]);
-  assert.equal(ld.hasOfferCatalog.itemListElement[0].priceSpecification.price, 450);
-  assert.match(published, /Влажная — от 450 ₸\/м²/);
-  const noToken = await putContent({
-    method: 'PUT',
-    headers: { ...host, cookie },
-    body: { content: next },
-    ip: '203.0.113.8',
-    secure: false,
-    now,
-  }, { publish: async () => { throw Object.assign(new Error('no'), { code: 'NO_TOKEN' }); } });
-  assert.equal(noToken.status, 503);
-  delete process.env.ADMIN_PASSWORD;
+await checkAsync('login, otp, and a price save', async () => {
+  const undo = captureEnv(AUTH_KEYS);
+  try {
+    useAuthEnv();
+    resetRateLimit();
+    const now = Date.now();
+    const sent = [];
+    const sendMail = async ({ to, code }) => { sent.push({ to, code }); };
+    const bad = await login({
+      method: 'POST', headers: host, body: { login: 'admin', password: 'not-the-password' }, ip: '203.0.113.8', secure: false, now,
+    }, { sendMail });
+    assert.equal(bad.status, 401);
+    assert.equal(bad.body.error, 'Неверный логин или пароль');
+    assert.equal(sent.length, 0);
+    const badLogin = await login({
+      method: 'POST', headers: host, body: { login: 'nope', password: 'correct-horse-battery' }, ip: '203.0.113.8', secure: false, now,
+    }, { sendMail });
+    assert.equal(badLogin.body.error, 'Неверный логин или пароль');
+    assert.equal(checkPassword('correct-horse-battery'), true);
+    assert.equal(checkLogin(' admin '), true);
+    const forged = await login({
+      method: 'POST',
+      headers: { ...host, origin: 'https://evil.example' },
+      body: { login: 'admin', password: 'correct-horse-battery' },
+      ip: '203.0.113.8',
+      secure: false,
+      now,
+    }, { sendMail });
+    assert.equal(forged.status, 403);
+    const started = await login({
+      method: 'POST', headers: host, body: { login: 'admin', password: 'correct-horse-battery' }, ip: '203.0.113.8', secure: false, now,
+    }, { sendMail });
+    assert.equal(started.status, 200);
+    assert.equal(started.body.step, 'otp');
+    assert.equal(started.body.email, 'o***@example.com');
+    assert.equal(sent[0].to, 'owner@example.com');
+    assert.match(sent[0].code, /^\d{6}$/);
+    const otp = cookieValue(started.headers['Set-Cookie'], 'qc_otp');
+    assert.equal(verifySession(otp, now), false);
+    const otpHeader = `qc_otp=${encodeURIComponent(otp)}`;
+    const wrong = await login({
+      method: 'POST', headers: { ...host, cookie: otpHeader }, body: { code: sent[0].code === '000000' ? '111111' : '000000' }, ip: '203.0.113.8', secure: false, now,
+    });
+    assert.equal(wrong.status, 401);
+    assert.equal(wrong.body.error, 'Неверный код');
+    const good = await login({
+      method: 'POST', headers: { ...host, cookie: otpHeader }, body: { code: ` ${sent[0].code.slice(0, 3)} ${sent[0].code.slice(3)} ` }, ip: '203.0.113.8', secure: false, now,
+    });
+    assert.equal(good.status, 200);
+    const session = cookieValue(good.headers['Set-Cookie'], 'qc_admin');
+    assert.equal(verifySession(session, now), true);
+    assert.equal(cookieValue(good.headers['Set-Cookie'], 'qc_otp'), '');
+    const cookie = `qc_admin=${encodeURIComponent(session)}`;
+    const denied = await getContent({ method: 'GET', headers: { ...host, cookie: '' }, ip: '203.0.113.8', secure: false, now });
+    assert.equal(denied.status, 401);
+    const next = structuredClone(content);
+    next.prices.wet = 450;
+    let published = null;
+    const saved = await putContent({
+      method: 'PUT',
+      headers: { ...host, cookie },
+      body: { content: next },
+      ip: '203.0.113.8',
+      secure: false,
+      now,
+    }, {
+      async publish(value) {
+        published = renderSite(value);
+        return { message: 'Сохранено в тесте' };
+      },
+    });
+    assert.equal(saved.status, 200);
+    assert.match(published, /от <b>450<\/b> ₸\/м²/);
+    const config = JSON.parse(published.match(/id="site-config">([\s\S]*?)<\/script>/)[1]);
+    assert.equal(config.prices.wet, 450);
+    const ld = JSON.parse(published.match(/<script type="application\/ld\+json">\n([\s\S]*?)\n<\/script>/)[1]);
+    assert.equal(ld.hasOfferCatalog.itemListElement[0].priceSpecification.price, 450);
+    assert.match(published, /Влажная — от 450 ₸\/м²/);
+    const noToken = await putContent({
+      method: 'PUT',
+      headers: { ...host, cookie },
+      body: { content: next },
+      ip: '203.0.113.8',
+      secure: false,
+      now,
+    }, { publish: async () => { throw Object.assign(new Error('no'), { code: 'NO_TOKEN' }); } });
+    assert.equal(noToken.status, 503);
+  } finally {
+    undo();
+  }
+});
+
+await checkAsync('otp expires, locks after repeated guesses, and resend rotates the code', async () => {
+  const undo = captureEnv(AUTH_KEYS);
+  try {
+    useAuthEnv();
+    resetRateLimit();
+    const now = Date.now();
+    const sent = [];
+    const sendMail = async ({ code }) => { sent.push(code); };
+    const ip = '203.0.113.30';
+    const started = await login({
+      method: 'POST', headers: host, body: { login: 'admin', password: 'correct-horse-battery' }, ip, secure: false, now,
+    }, { sendMail });
+    const original = cookieValue(started.headers['Set-Cookie'], 'qc_otp');
+    const header = `qc_otp=${encodeURIComponent(original)}`;
+    const wrongCode = sent[0] === '000000' ? '111111' : '000000';
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const bad = await login({
+        method: 'POST', headers: { ...host, cookie: header }, body: { code: wrongCode }, ip, secure: false, now,
+      });
+      assert.equal(bad.status, 401);
+      if (attempt < 4) assert.equal(bad.body.error, 'Неверный код');
+      else assert.equal(bad.body.step, 'credentials');
+    }
+    const locked = await login({
+      method: 'POST', headers: { ...host, cookie: header }, body: { code: sent[0] }, ip, secure: false, now,
+    });
+    assert.equal(locked.status, 401);
+    assert.equal(locked.body.step, 'credentials');
+    const expiredAt = now + 10 * 60 * 1000;
+    const again = await login({
+      method: 'POST', headers: host, body: { login: 'admin', password: 'correct-horse-battery' }, ip: '203.0.113.31', secure: false, now,
+    }, { sendMail });
+    const otp = cookieValue(again.headers['Set-Cookie'], 'qc_otp');
+    const otpHeader = `qc_otp=${encodeURIComponent(otp)}`;
+    const expired = await login({
+      method: 'POST', headers: { ...host, cookie: otpHeader }, body: { code: sent.at(-1) }, ip: '203.0.113.31', secure: false, now: expiredAt,
+    });
+    assert.equal(expired.status, 401);
+    const cooled = await login({
+      method: 'POST', headers: { ...host, cookie: otpHeader }, body: { resend: true }, ip: '203.0.113.31', secure: false, now,
+    });
+    assert.equal(cooled.status, 429);
+    const resent = await login({
+      method: 'POST', headers: { ...host, cookie: otpHeader }, body: { resend: true }, ip: '203.0.113.31', secure: false, now: now + 61_000,
+    }, { sendMail });
+    assert.equal(resent.status, 200);
+    assert.equal(sent.length, 3);
+    const nextHeader = `qc_otp=${encodeURIComponent(cookieValue(resent.headers['Set-Cookie'], 'qc_otp'))}`;
+    const stale = await login({
+      method: 'POST', headers: { ...host, cookie: nextHeader }, body: { code: sent[1] }, ip: '203.0.113.31', secure: false, now: now + 61_000,
+    });
+    assert.equal(stale.status, 401);
+    const fresh = await login({
+      method: 'POST', headers: { ...host, cookie: nextHeader }, body: { code: sent[2] }, ip: '203.0.113.31', secure: false, now: now + 61_000,
+    });
+    assert.equal(fresh.status, 200);
+    const failedSend = await login({
+      method: 'POST', headers: host, body: { login: 'admin', password: 'correct-horse-battery' }, ip: '203.0.113.32', secure: false, now,
+    }, { sendMail: async () => { throw new Error('down'); } });
+    assert.equal(failedSend.status, 502);
+    assert.equal(failedSend.headers['Set-Cookie'], undefined);
+    let seen = null;
+    await sendLoginCode({
+      to: 'owner@example.com',
+      code: '123456',
+      fetchImpl: async (url, options) => {
+        seen = { url, headers: options.headers, body: JSON.parse(options.body) };
+        return { ok: true, status: 200 };
+      },
+    });
+    assert.equal(seen.url, 'https://api.resend.com/emails');
+    assert.equal(seen.headers.Authorization, 'Bearer re_test_key_123456');
+    assert.equal(seen.body.from, 'Quality Клининг <login@example.com>');
+    assert.deepEqual(seen.body.to, ['owner@example.com']);
+    assert.match(seen.body.text, /123456/);
+    assert.equal(JSON.stringify(seen.body).includes('correct-horse-battery'), false);
+    await assert.rejects(() => sendLoginCode({
+      to: 'owner@example.com',
+      code: '123456',
+      fetchImpl: async () => ({ ok: false, status: 422 }),
+    }));
+    process.env.CMS_LOCAL_PUBLISH = '1';
+    delete process.env.RESEND_API_KEY;
+    delete process.env.VERCEL;
+    let called = false;
+    const logs = [];
+    const previousInfo = console.info;
+    console.info = (...args) => logs.push(args.join(' '));
+    try {
+      await sendLoginCode({
+        to: 'owner@example.com',
+        code: '654321',
+        fetchImpl: async () => { called = true; return { ok: true }; },
+      });
+    } finally {
+      console.info = previousInfo;
+    }
+    assert.equal(called, false);
+    assert.match(logs.join('\n'), /654321/);
+  } finally {
+    undo();
+  }
 });
 
 await checkAsync('github client commits on the branch name with a slash', async () => {
@@ -290,13 +513,14 @@ check('work uploads stay inside img/works and removals delete both files', () =>
 });
 
 await checkAsync('a new pair without both photos is rejected and a complete pair stops only on missing token', async () => {
+  const undo = captureEnv([...AUTH_KEYS, 'CMS_GITHUB_TOKEN']);
+  try {
   delete process.env.CMS_LOCAL_PUBLISH;
   delete process.env.CMS_GITHUB_TOKEN;
-  process.env.ADMIN_PASSWORD = 'correct-horse-battery';
+  useAuthEnv();
   resetRateLimit();
   const now = Date.now();
-  const good = await login({ method: 'POST', headers: host, body: { password: 'correct-horse-battery' }, ip: '203.0.113.20', secure: false, now });
-  const cookie = good.headers['Set-Cookie'].split(';')[0];
+  const cookie = await sessionHeader('203.0.113.20', now);
   const next = structuredClone(content);
   next.works = [{ id: 'abcdef012345', caption: 'Кухня', portrait: true, rev: 2 }];
   const missing = await putContent({
@@ -326,7 +550,9 @@ await checkAsync('a new pair without both photos is rejected and a complete pair
   }, { publish: publishContent });
   assert.equal(noToken.status, 503);
   assert.equal(fs.existsSync('img/works/abcdef012345-before.jpg'), false);
-  delete process.env.ADMIN_PASSWORD;
+  } finally {
+    undo();
+  }
 });
 
 await checkAsync('github commit stores jpeg bytes and deletes removed work photos', async () => {

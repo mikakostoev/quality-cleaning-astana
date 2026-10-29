@@ -1,0 +1,11 @@
+{
+  "name": "quality-cleaning-astana",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/render.mjs",
+    "render": "node scripts/render.mjs",
+    "test": "node scripts/test.mjs",
+    "dev:admin": "node scripts/dev-admin.mjs"
+  }
+}

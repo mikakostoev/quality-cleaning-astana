@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /templates
+Disallow: /content
+Disallow: /lib
+Disallow: /scripts
 
 Sitemap: https://quality-cleaning-astana.vercel.app/sitemap.xml
